@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: 'Shopping, schedule, tasks and chat for the Makharinskiy family — all in one place.',
   applicationName: 'MAKHARINSKIY',
   generator: 'v0.app',
-  // Ensure appleWebApp is set to standalone and black-translucent
+  manifest: '/manifest.json',
     appleWebApp: { 
     capable: true, 
     title: 'MAKHARINSKIY', 
