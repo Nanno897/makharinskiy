@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     title: 'MAKHARINSKIY', 
     statusBarStyle: 'black-translucent' 
   },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+  },
   icons: {
     icon: [{ url: '/logo.jpg', type: 'image/jpeg' }],
     apple: '/logo.jpg',
