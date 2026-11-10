@@ -12,12 +12,16 @@ export const metadata: Metadata = {
   description: 'Shopping, schedule, tasks and chat for the Makharinskiy family — all in one place.',
   applicationName: 'MAKHARINSKIY',
   generator: 'v0.app',
-  appleWebApp: { capable: true, title: 'MAKHARINSKIY', statusBarStyle: 'black-translucent' },
+  // Ensure appleWebApp is set to standalone and black-translucent
+    appleWebApp: { 
+    capable: true, 
+    title: 'MAKHARINSKIY', 
+    statusBarStyle: 'black-translucent' 
+  },
   icons: {
     icon: [{ url: '/logo.jpg', type: 'image/jpeg' }],
     apple: '/logo.jpg',
   },
-}
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
