@@ -1,0 +1,44 @@
+import { Analytics } from '@vercel/analytics/next'
+import type { Metadata, Viewport } from 'next'
+import { Geist, Playfair_Display } from 'next/font/google'
+import { ServiceWorkerRegister } from '@/components/service-worker-register'
+import './globals.css'
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
+
+export const metadata: Metadata = {
+  title: 'Makharinskiy Family Hub',
+  description: 'Shopping, schedule, tasks and chat for the Makharinskiy family — all in one place.',
+  applicationName: 'Family Hub',
+  generator: 'v0.app',
+  appleWebApp: { capable: true, title: 'Family Hub', statusBarStyle: 'black-translucent' },
+  icons: {
+    icon: [{ url: '/icon-512.png', type: 'image/png' }],
+    apple: '/icon-512.png',
+  },
+}
+
+export const viewport: Viewport = {
+  colorScheme: 'dark',
+  themeColor: '#09090b',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en" className={`dark ${geist.variable} ${playfair.variable}`}>
+      <body className="min-h-svh antialiased">
+        {children}
+        <ServiceWorkerRegister />
+        {process.env.NODE_ENV === 'production' && <Analytics />}
+      </body>
+    </html>
+  )
+}
