@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Makharinskiy Family Hub',
-    short_name: 'Family Hub',
+    name: 'Makharinskiy Fam',
+    short_name: 'Makharinskiy',
     description: 'Shopping, schedule, tasks and chat for the Makharinskiy family.',
     start_url: '/',
     display: 'standalone',
