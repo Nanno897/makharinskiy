@@ -13,8 +13,8 @@ export default function LoginPage() {
           <Crest size="lg" />
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-gold">Est. Family</p>
-            <h1 className="mt-2 font-serif text-3xl font-semibold text-balance">Makharinskiy Family Hub</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Everything the family shares, in one place.</p>
+            <h1 className="mt-2 font-serif text-3xl font-semibold text-balance">MAKHARINSKIY</h1>
+            <p className="mt-2 text-sm text-muted-foreground">.</p>
           </div>
         </div>
         <AuthForm />
