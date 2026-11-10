@@ -8,11 +8,11 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
 
 export const metadata: Metadata = {
-  title: 'Makharinskiy Family Hub',
+  title: 'MAKHARINSKIY',
   description: 'Shopping, schedule, tasks and chat for the Makharinskiy family — all in one place.',
   applicationName: 'MAKHARINSKIY',
   generator: 'v0.app',
-  appleWebApp: { capable: true, title: 'Family Hub', statusBarStyle: 'black-translucent' },
+  appleWebApp: { capable: true, title: 'MAKHARINSKIY', statusBarStyle: 'black-translucent' },
   icons: {
     icon: [{ url: '/logo.jpg', type: 'image/png' }],
     apple: '/logo.jpg',
