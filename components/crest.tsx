@@ -12,7 +12,7 @@ export function Crest({ size = 'md', className }: { size?: 'sm' | 'md' | 'lg'; c
       )}
     >
       <img 
-        src="/logo.png" 
+        src="/logo.jpg" 
         alt="Makharinskiy Logo" 
         className="w-full h-full rounded-2xl border border-amber-500/40 object-cover shadow-xl"
       />
