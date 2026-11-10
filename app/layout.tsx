@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   appleWebApp: { capable: true, title: 'MAKHARINSKIY', statusBarStyle: 'black-translucent' },
   icons: {
-    icon: [{ url: '/logo.jpg', type: 'image/png' }],
+    icon: [{ url: '/logo.jpg', type: 'image/jpeg' }],
     apple: '/logo.jpg',
   },
 }
