@@ -10,12 +10,12 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfa
 export const metadata: Metadata = {
   title: 'Makharinskiy Family Hub',
   description: 'Shopping, schedule, tasks and chat for the Makharinskiy family — all in one place.',
-  applicationName: 'Family Hub',
+  applicationName: 'MAKHARINSKIY',
   generator: 'v0.app',
   appleWebApp: { capable: true, title: 'Family Hub', statusBarStyle: 'black-translucent' },
   icons: {
-    icon: [{ url: '/icon-512.png', type: 'image/png' }],
-    apple: '/icon-512.png',
+    icon: [{ url: '/logo.jpg', type: 'image/png' }],
+    apple: '/logo.jpg',
   },
 }
 
