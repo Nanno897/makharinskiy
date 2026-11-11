@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, LogOut, Bell, User } from 'lucide-react'
+import { Loader2, LogOut, Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Button } from '@/components/ui/button'
@@ -12,14 +12,19 @@ import { MemberAvatar } from './member-avatar'
 export function HubHeader({
   userId,
   email,
+  avatarUrl,
+  userName,
   onOpenProfile,
 }: {
   userId: string
   email?: string
+  avatarUrl?: string
+  userName?: string
   onOpenProfile: () => void
 }) {
   const router = useRouter()
   const { profiles } = useProfiles()
+  const me = profiles[userId]
   const [signingOut, setSigningOut] = useState(false)
 
   async function signOut() {
@@ -47,6 +52,13 @@ export function HubHeader({
     }
   }
 
+  // Construct current user profile object for rendering
+  const currentProfile = me || {
+    id: userId,
+    display_name: userName || 'You',
+    avatar_url: avatarUrl || null,
+  }
+
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-4 h-16 bg-neutral-950/80 backdrop-blur border-b border-rose-950/30">
       <div className="flex items-center gap-2">
@@ -65,7 +77,7 @@ export function HubHeader({
           title="Open Profile Settings"
           aria-label="Open Profile Settings"
         >
-          <MemberAvatar userId={userId} />
+          <MemberAvatar profile={currentProfile} userId={userId} gold />
         </button>
 
         <Button
