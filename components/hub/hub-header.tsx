@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, LogOut, Bell } from 'lucide-react'
+import { Loader2, LogOut, Bell, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Button } from '@/components/ui/button'
@@ -15,12 +15,11 @@ export function HubHeader({
   onOpenProfile,
 }: {
   userId: string
-  email: string
+  email?: string
   onOpenProfile: () => void
 }) {
   const router = useRouter()
-  const { profiles, isLoading } = useProfiles()
-  const me = profiles[userId]
+  const { profiles } = useProfiles()
   const [signingOut, setSigningOut] = useState(false)
 
   async function signOut() {
@@ -49,7 +48,7 @@ export function HubHeader({
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-4 h-16 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <header className="sticky top-0 z-40 flex items-center justify-between px-4 h-16 bg-neutral-950/80 backdrop-blur border-b border-rose-950/30">
       <div className="flex items-center gap-2">
         <Crest />
         <div>
@@ -59,7 +58,15 @@ export function HubHeader({
       </div>
 
       <div className="flex items-center gap-1">
-        <MemberAvatar userId={userId} onClick={onOpenProfile} />
+        <button
+          type="button"
+          onClick={onOpenProfile}
+          className="rounded-full p-0.5 transition-transform active:scale-95 hover:ring-2 hover:ring-rose-500/50"
+          title="Open Profile Settings"
+          aria-label="Open Profile Settings"
+        >
+          <MemberAvatar userId={userId} />
+        </button>
 
         <Button
           variant="ghost"
@@ -77,6 +84,7 @@ export function HubHeader({
           onClick={signOut} 
           disabled={signingOut}
           className="text-neutral-400 hover:text-white"
+          title="Sign out"
         >
           {signingOut ? (
             <Loader2 className="h-5 w-5 animate-spin" />
