@@ -148,4 +148,70 @@ export function ShoppingList({ userId }: { userId: string }) {
                       type="checkbox"
                       checked={i.completed}
                       onChange={() => toggle(i.id, i.completed)}
-                      className="size-4 rounded border-neutral-700 bg-neutral-900 text-red-600 focus:ring-red
+                      className="size-4 rounded border-neutral-700 bg-neutral-900 text-red-600 focus:ring-red-600 cursor-pointer"
+                    />
+                    <span
+                      className={`text-base font-medium truncate ${
+                        i.completed ? 'line-through text-neutral-500' : 'text-neutral-100'
+                      }`}
+                    >
+                      {i.name}
+                    </span>
+                    {i.quantity && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-950/40 text-neutral-300 border border-rose-900/30">
+                        {i.quantity}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setEditingId(i.id)
+                        setNoteText(i.note || '')
+                      }}
+                      className={`size-8 ${i.note ? 'text-amber-400' : 'text-neutral-400'}`}
+                    >
+                      <FileText className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(i.id)}
+                      className="size-8 text-neutral-400 hover:text-red-400"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {i.note && editingId !== i.id && <p className="text-xs text-neutral-400 pl-7 italic">Note: {i.note}</p>}
+
+                {editingId === i.id && (
+                  <div className="flex items-center gap-2 pl-7 pt-1">
+                    <Input
+                      placeholder="Add a note..."
+                      value={noteText}
+                      onChange={(e) => setNoteText(e.target.value)}
+                      className="flex-1 h-8 text-xs bg-neutral-950/80 border-neutral-700 text-white"
+                      autoFocus
+                    />
+                    <Button type="button" size="icon" onClick={() => saveNote(i.id)} className="size-8 bg-emerald-600 text-white">
+                      <Check className="size-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setEditingId(null)} className="size-8 text-neutral-400">
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
