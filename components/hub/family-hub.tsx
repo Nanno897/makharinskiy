@@ -24,30 +24,41 @@ export function FamilyHub({ userId, email }: { userId: string; email: string }) 
   const [profileOpen, setProfileOpen] = useState(false)
 
   return (
-    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-neutral-950">
-      <HubHeader userId={userId} email={email} onOpenProfile={() => setProfileOpen(true)} />
+  <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-neutral-950 text-white">
+    {/* 1. Header */}
+    <HubHeader userId={userId} email={email} onOpenProfile={() => setProfileOpen(true)} />
 
-      <nav aria-label="Modules" className="sticky top-16 z-30 hidden border-b border-border bg-background/80 backdrop-blur md:block">
-        <div className="mx-auto flex max-w-5xl gap-1 px-4">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              aria-current={tab === id ? 'page' : undefined}
-              className={cn(
-                'flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors',
-                tab === id
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground',
-              )}
-            >
-              <Icon className={cn('size-4', tab === id && 'text-red-500')} aria-hidden="true" />
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
+    {/* 2. Main content area (fills the middle space and scrolls if needed) */}
+    <main className="flex-1 overflow-y-auto px-4 py-3">
+      {tab === 'shopping' && <ShoppingView />}
+      {tab === 'schedule' && <ScheduleView />}
+      {tab === 'todos' && <TodosView />}
+      {tab === 'chat' && <ChatView />}
+    </main>
+
+    {/* 3. Navigation Bar (locked at the bottom) */}
+    <nav aria-label="Modules" className="shrink-0 border-t border-neutral-800 bg-neutral-950 px-4 py-2">
+      <div className="mx-auto flex max-w-5xl justify-around gap-1">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            className={cn(
+              'flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-xs transition-colors',
+              tab === id
+                ? 'text-amber-400 bg-neutral-900'
+                : 'text-neutral-400 hover:text-white'
+            )}
+          >
+            <Icon className="size-5" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+    </nav>
+  </div>
+)
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-28 md:pb-10">
         {tab === 'shopping' && <ShoppingList userId={userId} />}
