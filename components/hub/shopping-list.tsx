@@ -19,7 +19,7 @@ export interface ShoppingItem {
 }
 
 export function ShoppingList({ userId }: { userId: string }) {
-  const { data: items = [], isLoading, error, mutate } = useRealtimeTable<ShoppingItem>('shopping_items', {
+  const { data: items = [], isLoading, error, mutate } = useRealtimeTable<ShoppingItem>('shopping_list', {
     orderBy: 'created_at',
   })
 
@@ -46,7 +46,7 @@ export function ShoppingList({ userId }: { userId: string }) {
     setName('')
     setQuantity('')
 
-    const { error } = await createClient().from('shopping_items').insert(newItem)
+    const { error } = await createClient().from('shopping_list').insert(newItem)
     if (error) {
       console.error('Error adding item:', error)
       mutate()
@@ -59,7 +59,7 @@ export function ShoppingList({ userId }: { userId: string }) {
     })
 
     const { error } = await createClient()
-      .from('shopping_items')
+      .from('shopping_list')
       .update({ completed: !currentCompleted })
       .eq('id', id)
 
@@ -72,7 +72,7 @@ export function ShoppingList({ userId }: { userId: string }) {
   const remove = async (id: string) => {
     mutate((prev) => prev?.filter((i) => i.id !== id), { revalidate: false })
 
-    const { error } = await createClient().from('shopping_items').delete().eq('id', id)
+    const { error } = await createClient().from('shopping_list').delete().eq('id', id)
     if (error) {
       console.error('Error removing item:', error)
       mutate()
@@ -88,7 +88,7 @@ export function ShoppingList({ userId }: { userId: string }) {
     setNoteText('')
 
     const { error } = await createClient()
-      .from('shopping_items')
+      .from('shopping_list')
       .update({ note: trimmedNote || null })
       .eq('id', id)
 
