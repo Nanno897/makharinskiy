@@ -133,7 +133,7 @@ export function ShoppingList({ userId }: { userId: string }) {
         ) : items.length === 0 ? (
           <EmptyState icon={Plus} title="No items on the shopping list yet" hint="Add your first item above." />
         ) : (
-          <div className="space-y-1">
+          <div className="max-h-[55vh] overflow-y-auto pr-1 space-y-1">
             {items.map((i) => (
               <div key={i.id} className="flex flex-col gap-1 border-b border-rose-950/30 py-3 px-1">
                 <div className="flex items-center justify-between gap-3">
@@ -188,24 +188,3 @@ export function ShoppingList({ userId }: { userId: string }) {
                   <div className="flex items-center gap-2 pl-7 pt-1">
                     <Input
                       placeholder="Add a note..."
-                      value={noteText}
-                      onChange={(e) => setNoteText(e.target.value)}
-                      className="flex-1 h-8 text-xs bg-neutral-950/80 border-neutral-700 text-white"
-                      autoFocus
-                    />
-                    <Button type="button" size="icon" onClick={() => saveNote(i.id)} className="size-8 bg-emerald-600 text-white">
-                      <Check className="size-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => setEditingId(null)} className="size-8 text-neutral-400">
-                      <X className="size-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
