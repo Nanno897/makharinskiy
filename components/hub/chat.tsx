@@ -12,6 +12,7 @@ import { MemberAvatar } from './member-avatar'
 import { EmptyState, ErrorState, InlineError, ListSkeleton, SectionHeader } from './states'
 import { EmojiPicker } from './emoji-picker'
 import { cn } from '@/lib/utils'
+import { playChatToggleFeedback, triggerHaptic } from '@/lib/feedback'
 
 function dayLabel(d: Date) {
   if (isToday(d)) return 'Today'
