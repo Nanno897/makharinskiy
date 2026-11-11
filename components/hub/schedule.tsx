@@ -55,7 +55,6 @@ function getGermanHoliday(date: Date): string | null {
   const month = date.getMonth() + 1
   const year = date.getFullYear()
 
-  // Fixed official & unofficial holidays
   if (month === 1 && day === 1) return "Neujahr (New Year's Day)"
   if (month === 5 && day === 1) return "Tag der Arbeit (Labour Day)"
   if (month === 10 && day === 3) return "Tag der Deutschen Einheit"
@@ -66,7 +65,6 @@ function getGermanHoliday(date: Date): string | null {
   if (month === 12 && day === 6) return "Nikolaus"
   if (month === 12 && day === 31) return "Silvester (New Year's Eve)"
 
-  // Moveable Easter-based holidays
   const easter = getEasterSunday(year)
   
   const karfreitag = new Date(easter)
@@ -177,7 +175,7 @@ export function Schedule({ userId }: { userId: string }) {
                     key={day.toISOString()}
                     type="button"
                     onClick={() => setSelected(day)}
-                    aria-label={`${format(day, 'EEEE, MMMM d')}${holiday ? `, ${holiday}` : ''}${evs.length ? `, ${evs.length} event${evs.length > 1 ? 's' : ''}` : ''}`}
+                    aria-label={`${format(day, 'EEEE, MMMM d')}${holiday ? `, ${holiday}` : ''}${evs.length ? `, ${evs.length} event` : ''}`}
                     aria-pressed={isSel}
                     className={cn(
                       'flex aspect-square flex-col items-center justify-start gap-1 rounded-xl p-1 text-sm transition-all sm:p-2',
@@ -207,26 +205,8 @@ export function Schedule({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
-              {isToday(selected) ? 'Today' : format(selected, 'EEEE, MMM d')}
-            </h3>
-            <InlineError message={actionError} />
-            
-            <div className="flex flex-col gap-2">
-              {activeHoliday && (
-                <div className="rounded-2xl border border-amber-500/30 bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-                  <div className="flex items-center gap-2 text-amber-300 font-medium">
-                    <Sparkles className="size-4" />
-                    <span>{activeHoliday}</span>
-                  </div>
-                  <p className="mt-1 text-xs text-neutral-400">German Holiday / Observance</p>
-                </div>
-              )}
-
-              {selectedEvents.length === 0 && !activeHoliday ? (
-                <EmptyState icon={CalendarPlus} title="No events" hint="Nothing planned for this day." />
-              ) : (
-                selectedEvents.map((ev) => (
+            <h3 className="
+Events.map((ev) => (
                   <li
                     key={ev.id}
                     className="list-none rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
