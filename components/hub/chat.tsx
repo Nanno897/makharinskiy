@@ -73,7 +73,7 @@ export function Chat({ userId }: { userId: string }) {
     <section className="flex h-[calc(100svh-16rem)] min-h-[420px] flex-col md:h-[calc(100svh-12rem)]">
       <SectionHeader title="Family Chat" subtitle="Live with everyone at home" />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-label="Messages">
           {isLoading ? (
             <ListSkeleton rows={4} />
@@ -94,25 +94,25 @@ export function Chat({ userId }: { userId: string }) {
                 return (
                   <li key={m.id}>
                     {newDay && (
-                      <div className="my-4 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.2em] text-gold/80">
-                        <span className="h-px flex-1 bg-border" />
+                      <div className="my-4 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.2em] text-amber-300/80">
+                        <span className="h-px flex-1 bg-white/[0.06]" />
                         {dayLabel(date)}
-                        <span className="h-px flex-1 bg-border" />
+                        <span className="h-px flex-1 bg-white/[0.06]" />
                       </div>
                     )}
                     <div className={cn('flex items-end gap-2', mine && 'flex-row-reverse', !grouped && 'mt-3')}>
                       {grouped ? (
                         <span className="w-9 shrink-0" />
                       ) : (
-                        <MemberAvatar profile={author} gold={mine} />
+                        <MemberAvatar profile={author} />
                       )}
                       <div className={cn('flex max-w-[78%] flex-col', mine ? 'items-end' : 'items-start')}>
                         {!grouped && (
                           <span className="mb-1 flex items-baseline gap-2 px-1 text-xs">
-                            <span className="font-medium" style={{ color: author?.badge_color }}>
+                            <span className="font-medium" style={{ color: author?.badge_color ?? '#fcd34d' }}>
                               {mine ? 'You' : (author?.display_name ?? 'Member')}
                             </span>
-                            <time dateTime={m.created_at} className="text-muted-foreground">
+                            <time dateTime={m.created_at} className="text-neutral-500">
                               {format(date, 'h:mm a')}
                             </time>
                           </span>
@@ -120,7 +120,7 @@ export function Chat({ userId }: { userId: string }) {
                         <p
                           className={cn(
                             'whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm',
-                            mine ? 'rounded-br-sm bg-primary text-primary-foreground' : 'rounded-bl-sm bg-secondary'
+                            mine ? 'rounded-br-sm bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white shadow-[0_0_15px_rgba(159,18,57,0.3)] border border-rose-800/60' : 'rounded-bl-sm bg-neutral-900/80 border border-white/[0.06] text-neutral-200'
                           )}
                           title={format(date, 'PPpp')}
                         >
@@ -135,7 +135,7 @@ export function Chat({ userId }: { userId: string }) {
           )}
         </div>
 
-        <div className="relative border-t border-border p-3">
+        <div className="relative border-t border-white/[0.06] p-3 bg-neutral-950/60">
           {pickerOpen && (
             <div className="absolute bottom-full left-3 mb-2">
               <EmojiPicker onSelect={insertEmoji} onClose={() => setPickerOpen(false)} />
@@ -159,7 +159,7 @@ export function Chat({ userId }: { userId: string }) {
                 playChatToggleFeedback()
                 setPickerOpen((o) => !o)
               }}
-              className={cn(pickerOpen ? 'text-gold' : 'text-muted-foreground')}
+              className={cn('text-neutral-400 hover:text-amber-300 hover:bg-white/[0.04]', pickerOpen && 'text-amber-300')}
             >
               <Smile />
             </Button>
@@ -179,9 +179,9 @@ export function Chat({ userId }: { userId: string }) {
                   send()
                 }
               }}
-              className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-rose-700"
             />
-            <Button type="submit" size="icon" disabled={sending || !text.trim()} aria-label="Send message" className="glow-red">
+            <Button type="submit" size="icon" disabled={sending || !text.trim()} aria-label="Send message" className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]">
               {sending ? <Loader2 className="animate-spin" /> : <SendHorizontal />}
             </Button>
           </form>
