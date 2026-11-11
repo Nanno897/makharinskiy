@@ -171,61 +171,8 @@ export function Schedule({ userId }: { userId: string }) {
                 return (
                   <button
                     key={day.toISOString()}
-                    type="button"
-                    onClick={() => setSelected(day)}
-                    aria-label={`${format(day, 'EEEE, MMMM d')}${holiday ? `, ${holiday}` : ''}${evs.length ? `, ${evs.length} event` : ''}`}
-                    aria-pressed={isSel}
-                    className={cn(
-                      'flex aspect-square flex-col items-center justify-start gap-1 rounded-xl p-1 text-sm transition-all sm:p-2',
-                      !isSameMonth(day, month) && 'text-neutral-600',
-                      isSameMonth(day, month) && !isSel && 'text-neutral-200 hover:bg-white/[0.04]',
-                      isSel && 'bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white font-semibold shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-800/60 scale-105 z-10',
-                      !isSel && isToday(day) && 'ring-1 ring-amber-400/60 text-amber-300',
-                    )}
-                  >
-                    <span className="font-medium">{format(day, 'd')}</span>
-                    <span className="flex gap-0.5 items-center">
-                      {holiday && <span className="size-1.5 rounded-full bg-amber-400" title={holiday} />}
-                      {evs.length > 0 && evs.slice(0, 2).map((_, i) => (
-                        <span
-                          key={i}
-                          className={cn(
-                            "size-1.5 rounded-full",
-                            i === 0 ? "bg-rose-400/90" : i === 1 ? "bg-purple-400/90" : "bg-amber-400/90"
-                          )}
-                        />
-                      ))}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
-              {isToday(selected) ? 'Today' : format(selected, 'EEEE, MMM d')}
-            </h3>
-            <InlineError message={actionError} />
-            
-            <div className="flex flex-col gap-2">
-              {activeHoliday && (
-                <div className="rounded-2xl border border-amber-500/30 bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-                  <div className="flex items-center gap-2 text-amber-300 font-medium">
-                    <Sparkles className="size-4" />
-                    <span>{activeHoliday}</span>
-                  </div>
-                  <p className="mt-1 text-xs text-neutral-400">German Holiday / Observance</p>
-                </div>
-              )}
-
-              {selectedEvents.length === 0 && !activeHoliday ? (
-                <EmptyState icon={CalendarPlus} title="No events" hint="Nothing planned for this day." />
-              ) : (
-                selectedEvents.map((ev) => {
-                  const timeText = ev.all_day ? 'All day' : `${format(parseISO(ev.starts_at), 'h:mm a')}${ev.ends_at ? ` – ${format(parseISO(ev.ends_at), 'h:mm a')}` : ''}`
-                  return (
-                    <div key={ev.id} className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]" style={{ borderLeft: `3px solid ${ev.color}` }}>
+                    type
+                   <div key={ev.id} className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]" style={{ borderLeft: `3px solid ${ev.color}` }}>
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="font-medium text-white">{ev.title}</p>
