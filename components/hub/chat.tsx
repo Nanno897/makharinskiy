@@ -1,5 +1,5 @@
 'use client'
-
+import { ChatCharacters } from './chat-characters'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { Loader2, MessageCircle, SendHorizontal, Smile } from 'lucide-react'
