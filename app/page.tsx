@@ -13,8 +13,8 @@ export default async function Home() {
 
   return (
     <>
-      <FamilyHub userId={user.id} email={user.email} />
       <PushButton />
+      <FamilyHub userId={user.id} email={user.email} />
     </>
   )
 }
