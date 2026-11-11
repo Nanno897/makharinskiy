@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, LogOut, Bell } from 'lucide-react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Button } from '@/components/ui/button'
@@ -60,11 +61,14 @@ export function HubHeader({
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-white/[0.06] shadow-lg">
       <div className="flex items-center gap-3">
-        {/* Bold Crimson & Gold "M" App Icon */}
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose-800 via-rose-950 to-neutral-950 border border-amber-400/40 shadow-[0_0_20px_rgba(159,18,57,0.4)]">
-          <span className="font-serif text-xl font-bold tracking-wider text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-            M
-          </span>
+        {/* Custom Logo Graphic */}
+        <div className="relative size-11 shrink-0 overflow-hidden rounded-xl border border-amber-400/30 shadow-[0_0_20px_rgba(159,18,57,0.4)]">
+          <Image
+            src="/icon.png" // Update to your exact uploaded asset name if placed in public folder (e.g. /logo.png)
+            alt="Makharinskiy Logo"
+            fill
+            className="object-cover"
+          />
         </div>
         <div>
           <h1 className="text-white font-serif text-lg sm:text-xl font-bold leading-tight tracking-wide">Makharinskiy</h1>
