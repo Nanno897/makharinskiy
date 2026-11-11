@@ -9,7 +9,7 @@ import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MemberAvatar } from './member-avatar'
 import { triggerHaptic } from '@/lib/feedback'
-import type { Todo, FamilyEvent, ShoppingItem } from '@/lib/types'
+import type { TodoItem, FamilyEvent, ShoppingItem } from '@/lib/types'
 
 export function ProfileDialog({
   userId,
@@ -28,7 +28,7 @@ export function ProfileDialog({
   const [signingOut, setSigningOut] = useState(false)
 
   // Realtime counts for current member
-  const { data: todos } = useRealtimeTable<Todo>('todos')
+  const { data: todos } = useRealtimeTable<TodoItem>('todo_items')
   const { data: events } = useRealtimeTable<FamilyEvent>('events')
   const { data: shopping } = useRealtimeTable<ShoppingItem>('shopping_items')
 
