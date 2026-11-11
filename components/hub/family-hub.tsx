@@ -1,85 +1,121 @@
 'use client'
 
-import { useState } from 'react'
-import { CalendarDays, CheckSquare, MessageCircle, ShoppingCart, type LucideIcon } from 'lucide-react'
-import { HubHeader } from './hub-header'
-import { ShoppingList } from './shopping-list'
-import { Schedule } from './schedule'
-import { TodoList } from './todo-list'
-import { Chat } from './chat'
-import { ProfileDialog } from './profile-dialog'
-import { cn } from '@/lib/utils'
+import React, { useState } from 'react'
+import { Header } from '@/components/hub/hub-header'
+import { Navigation } from '@/components/hub/navigation'
+import { ShoppingList } from '@/components/hub/shopping-list'
+import { ProfileDialog } from '@/components/hub/profile-dialog'
 
-type Tab = 'shopping' | 'schedule' | 'todos' | 'chat'
+export interface FamilyHubProps {
+  userId: string
+  userName?: string
+  avatarUrl?: string
+}
 
-const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
-  { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
-  { id: 'schedule', label: 'Schedule', icon: CalendarDays },
-  { id: 'todos', label: 'To-Do', icon: CheckSquare },
-  { id: 'chat', label: 'Chat', icon: MessageCircle },
-]
+export function HubBackground({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative min-h-[calc(100vh-140px)] rounded-2xl border border-rose-950/40 bg-gradient-to-b from-neutral-900 via-neutral-950 to-neutral-950 p-4 sm:p-6 shadow-2xl overflow-hidden flex flex-col justify-between">
+      {/* Dynamic Font Link for handwritten title */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap"
+        rel="stylesheet"
+      />
 
-export function FamilyHub({ userId, email }: { userId: string; email: string }) {
-  const [tab, setTab] = useState<Tab>('shopping')
-  const [profileOpen, setProfileOpen] = useState(false)
+      {/* Main Content Area */}
+      <div className="relative z-10 flex-1 flex flex-col">{children}</div>
+
+      {/* Red Floral Corner Artwork */}
+      <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-75 translate-x-3 translate-y-3">
+        <svg
+          width="180"
+          height="180"
+          viewBox="0 0 200 200"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g transform="rotate(-15 100 100)">
+            <path
+              d="M120 180 Q150 140 180 100"
+              stroke="#881337"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <path
+              d="M140 160 Q170 120 190 80"
+              stroke="#9f1239"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="170" cy="95" r="12" fill="#9f1239" />
+            <circle cx="158" cy="85" r="10" fill="#be123c" />
+            <circle cx="182" cy="85" r="10" fill="#881337" />
+            <circle cx="170" cy="75" r="11" fill="#e11d48" />
+            <circle cx="170" cy="90" r="4" fill="#fbbf24" />
+            <circle cx="135" cy="140" r="14" fill="#881337" />
+            <circle cx="120" cy="130" r="11" fill="#9f1239" />
+            <circle cx="148" cy="128" r="11" fill="#be123c" />
+            <circle cx="135" cy="118" r="12" fill="#e11d48" />
+            <circle cx="135" cy="132" r="4.5" fill="#fbbf24" />
+            <path d="M110 165 C105 150, 125 145, 120 160 Z" fill="#4c0519" />
+            <path d="M150 115 C145 100, 165 95, 160 110 Z" fill="#4c0519" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
+  const [activeTab, setActiveTab] = useState<'shopping' | 'schedule' | 'todo' | 'chat'>('shopping')
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   return (
-    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-neutral-950">
-      <HubHeader userId={userId} email={email} onOpenProfile={() => setProfileOpen(true)} />
+    <div className="flex h-[100dvh] flex-col bg-black text-white overflow-hidden">
+      {/* Header with active Profile Trigger on question mark */}
+      <Header
+        onOpenProfile={() => setIsProfileOpen(true)}
+        userName={userName}
+        avatarUrl={avatarUrl}
+      />
 
-      <nav aria-label="Modules" className="sticky top-16 z-30 hidden border-b border-border bg-background/80 backdrop-blur md:block">
-        <div className="mx-auto flex max-w-5xl gap-1 px-4">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              aria-current={tab === id ? 'page' : undefined}
-              className={cn(
-                'flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors',
-                tab === id
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground',
-              )}
-            >
-              <Icon className={cn('size-4', tab === id && 'text-red-500')} aria-hidden="true" />
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
+      {/* Main Tab View Wrapped in Marble/Floral Theme */}
+      <main className="flex-1 overflow-y-auto p-4">
+        <HubBackground>
+          {activeTab === 'shopping' && <ShoppingList userId={userId} />}
 
-      <main className="mx-auto w-full max-w-5xl flex-1 overflow-y-auto px-4 pt-6 pb-28 md:pb-10">
-        {tab === 'shopping' && <ShoppingList userId={userId} />}
-        {tab === 'schedule' && <Schedule userId={userId} />}
-        {tab === 'todos' && <TodoList userId={userId} />}
-        {tab === 'chat' && <Chat userId={userId} />}
+          {activeTab === 'schedule' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">Schedule & Calendar</h3>
+              <p className="text-sm">Your family schedule will appear here.</p>
+            </div>
+          )}
+
+          {activeTab === 'todo' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">To-Do Tasks</h3>
+              <p className="text-sm">Your active tasks list will appear here.</p>
+            </div>
+          )}
+
+          {activeTab === 'chat' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">Family Chat</h3>
+              <p className="text-sm">Real-time messaging will appear here.</p>
+            </div>
+          )}
+        </HubBackground>
       </main>
 
-      <nav
-        aria-label="Modules"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
-      >
-        <div className="grid grid-cols-4">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              aria-current={tab === id ? 'page' : undefined}
-              className={cn(
-                'flex flex-col items-center gap-1 py-3 text-[11px] font-medium transition-colors',
-                tab === id ? 'text-red-500' : 'text-muted-foreground',
-              )}
-            >
-              <Icon className="size-5" aria-hidden="true" />
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
+      {/* Bottom Navigation */}
+      <Navigation activeTab={activeTab} onTabChange={(tab: any) => setActiveTab(tab)} />
 
-      <ProfileDialog userId={userId} open={profileOpen} onOpenChange={setProfileOpen} />
+      {/* Profile Dialog */}
+      <ProfileDialog
+        open={isProfileOpen}
+        onOpenChange={setIsProfileOpen}
+        userId={userId}
+        currentAvatarUrl={avatarUrl}
+      />
     </div>
   )
 }
