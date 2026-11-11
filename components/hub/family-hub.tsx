@@ -44,6 +44,7 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       {/* Header */}
       <div className="relative z-20 flex-none bg-neutral-950/40 backdrop-blur-md border-b border-rose-950/30">
         <HubHeader
+          userId={userId}
           onOpenProfile={() => setIsProfileOpen(true)}
           userName={userName}
           avatarUrl={avatarUrl}
