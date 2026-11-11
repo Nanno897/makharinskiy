@@ -88,7 +88,8 @@ export function TodoList({ userId }: { userId: string }) {
     <section>
       <SectionHeader title="To-Do" subtitle={data ? `${activeCount} open task${activeCount === 1 ? '' : 's'}` : undefined} />
 
-      <form onSubmit={addTodo} className="mb-4 rounded-2xl border border-border bg-card p-3">
+      {/* Transparent Charcoal Task-Entry Card */}
+      <form onSubmit={addTodo} className="mb-4 rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
         <div className="flex flex-col gap-2 sm:flex-row">
           <label htmlFor="todo-title" className="sr-only">Task</label>
           <Input
@@ -97,10 +98,16 @@ export function TodoList({ userId }: { userId: string }) {
             maxLength={200}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="flex-1"
+            className="flex-1 border-white/10 bg-black/40 text-white placeholder:text-neutral-500"
           />
           <label htmlFor="todo-due" className="sr-only">Due date</label>
-          <Input id="todo-due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="sm:w-40 [color-scheme:dark]" />
+          <Input 
+            id="todo-due" 
+            type="date" 
+            value={dueDate} 
+            onChange={(e) => setDueDate(e.target.value)} 
+            className="sm:w-40 border-white/10 bg-black/40 text-white [color-scheme:dark]" 
+          />
           <Button
             type="button"
             variant="outline"
@@ -108,11 +115,19 @@ export function TodoList({ userId }: { userId: string }) {
             aria-pressed={priority}
             aria-label="Mark as priority"
             onClick={() => setPriority((p) => !p)}
-            className={cn(priority && 'border-gold/60 text-gold')}
+            className={cn(
+              'border-white/10 bg-black/40 text-neutral-400 hover:text-amber-400',
+              priority && 'border-amber-500/50 bg-amber-950/30 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
+            )}
           >
-            <Star className={cn(priority && 'fill-gold')} />
+            <Star className={cn(priority && 'fill-amber-400')} />
           </Button>
-          <Button type="submit" disabled={adding || !title.trim()}>
+          {/* Dark Burgundy Gradient Add Task Button */}
+          <Button 
+            type="submit" 
+            disabled={adding || !title.trim()}
+            className="bg-gradient-to-br from-rose-800 via-rose-950 to-neutral-950 hover:from-rose-700 hover:to-rose-900 text-white shadow-[0_0_20px_rgba(159,18,57,0.4)] border border-rose-900/50"
+          >
             {adding ? <Loader2 className="animate-spin" /> : <Plus />}
             Add task
           </Button>
@@ -120,6 +135,7 @@ export function TodoList({ userId }: { userId: string }) {
         <InlineError message={actionError} />
       </form>
 
+      {/* Filter Tabs with Wine-Red Outlines on Active */}
       <div role="tablist" aria-label="Filter tasks" className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
@@ -129,10 +145,10 @@ export function TodoList({ userId }: { userId: string }) {
             aria-selected={filter === f.id}
             onClick={() => setFilter(f.id)}
             className={cn(
-              'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+              'rounded-full border px-3.5 py-1 text-xs font-medium transition-all backdrop-blur-md',
               filter === f.id
-                ? 'border-primary bg-primary/15 text-red-400'
-                : 'border-border text-muted-foreground hover:text-foreground',
+                ? 'border-rose-900/80 bg-rose-950/40 text-white shadow-[0_0_15px_rgba(159,18,57,0.3)]'
+                : 'border-white/[0.06] bg-neutral-950/40 text-neutral-400 hover:text-white',
             )}
           >
             {f.label}
@@ -155,20 +171,21 @@ export function TodoList({ userId }: { userId: string }) {
               <li
                 key={todo.id}
                 className={cn(
-                  'flex items-center gap-3 rounded-xl border bg-card px-4 py-3',
-                  todo.priority && !todo.completed ? 'border-gold/30' : 'border-border',
+                  'flex items-center gap-3 rounded-2xl border bg-neutral-950/40 backdrop-blur-md px-4 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all',
+                  todo.priority && !todo.completed ? 'border-amber-500/40 bg-neutral-900/50' : 'border-white/[0.06]',
+                  todo.completed && 'opacity-50 bg-neutral-950/20'
                 )}
               >
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
                   onCheckedChange={() => update(todo, { completed: !todo.completed })}
-                  className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                  className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700"
                 />
                 <div className="min-w-0 flex-1">
                   <label
                     htmlFor={`todo-${todo.id}`}
-                    className={cn('block cursor-pointer truncate text-sm', todo.completed && 'text-muted-foreground line-through')}
+                    className={cn('block cursor-pointer truncate text-sm text-white font-medium', todo.completed && 'text-neutral-400 line-through')}
                   >
                     {todo.title}
                   </label>
@@ -176,7 +193,7 @@ export function TodoList({ userId }: { userId: string }) {
                     <span
                       className={cn(
                         'mt-0.5 inline-flex items-center gap-1 text-xs',
-                        overdue ? 'text-red-400' : isToday(due) ? 'text-gold' : 'text-muted-foreground',
+                        overdue ? 'text-red-400' : isToday(due) ? 'text-amber-400' : 'text-neutral-400',
                       )}
                     >
                       <CalendarClock className="size-3" aria-hidden="true" />
@@ -192,16 +209,16 @@ export function TodoList({ userId }: { userId: string }) {
                   aria-pressed={todo.priority}
                   aria-label={todo.priority ? 'Remove priority' : 'Mark as priority'}
                   onClick={() => update(todo, { priority: !todo.priority })}
-                  className={todo.priority ? 'text-gold' : 'text-muted-foreground'}
+                  className={cn(todo.priority ? 'text-amber-400 bg-amber-950/30' : 'text-neutral-500 hover:text-amber-400')}
                 >
-                  <Star className={cn(todo.priority && 'fill-gold')} />
+                  <Star className={cn(todo.priority && 'fill-amber-400')} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon-sm"
                   onClick={() => remove(todo.id)}
                   aria-label={`Delete ${todo.title}`}
-                  className="text-muted-foreground hover:text-red-500"
+                  className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
                 >
                   <Trash2 />
                 </Button>
