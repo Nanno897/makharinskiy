@@ -24,7 +24,7 @@ export function FamilyHub({ userId, email }: { userId: string; email: string }) 
   const [profileOpen, setProfileOpen] = useState(false)
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-neutral-950">
       <HubHeader userId={userId} email={email} onOpenProfile={() => setProfileOpen(true)} />
 
       <nav aria-label="Modules" className="sticky top-16 z-30 hidden border-b border-border bg-background/80 backdrop-blur md:block">
