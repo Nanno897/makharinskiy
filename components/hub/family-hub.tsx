@@ -22,25 +22,27 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
     <div className="fixed inset-0 flex flex-col bg-black text-white overflow-hidden select-none">
       <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet" />
 
-      {/* Luxury Black & Red Marble Background Layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-black to-neutral-900 pointer-events-none z-0" />
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-950/70 via-transparent to-neutral-950 pointer-events-none z-0" />
+      {/* High-Visibility Rich Black & Crimson Red Marble Background */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-neutral-950 via-neutral-900 to-black pointer-events-none z-0" />
+      <div className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-rose-950/80 via-rose-950/30 to-black pointer-events-none z-0" />
       
-      {/* Marble Vein Lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-35 pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+      {/* Dynamic Marble Vein Lines */}
+      <svg className="absolute inset-0 w-full h-full opacity-60 pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="marbleVein" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e11d48" stopOpacity="0.7" />
-            <stop offset="50%" stopColor="#881337" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0.9" />
+          <linearGradient id="luxuryMarbleVein" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.8" />
+            <stop offset="40%" stopColor="#be123c" stopOpacity="0.7" />
+            <stop offset="70%" stopColor="#4c0519" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#09090b" stopOpacity="1" />
           </linearGradient>
         </defs>
-        <path d="M-50,200 Q300,100 600,400 T1100,100" stroke="url(#marbleVein)" strokeWidth="3" fill="none" />
-        <path d="M100,-50 Q400,600 200,800 T900,1000" stroke="url(#marbleVein)" strokeWidth="2" fill="none" />
+        <path d="M-100,50 Q350,200 200,600 T1000,200" stroke="url(#luxuryMarbleVein)" strokeWidth="4" fill="none" />
+        <path d="M50,-50 Q100,500 500,700 T1200,900" stroke="url(#luxuryMarbleVein)" strokeWidth="3" fill="none" />
+        <path d="M200,0 Q600,300 400,900 T800,400" stroke="#e11d48" strokeWidth="2" fill="none" opacity="0.6" />
       </svg>
 
       {/* Header */}
-      <div className="relative z-20 flex-none bg-neutral-950/70 backdrop-blur-md border-b border-rose-950/40">
+      <div className="relative z-20 flex-none bg-neutral-950/60 backdrop-blur-md border-b border-rose-950/50">
         <HubHeader
           onOpenProfile={() => setIsProfileOpen(true)}
           userName={userName}
@@ -48,9 +50,9 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         />
       </div>
 
-      {/* Main Content Area (Scrollable with translucent cards) */}
-      <main className="relative z-10 flex-1 overflow-y-auto p-3 sm:p-4 pb-20">
-        <div className="h-full rounded-2xl border border-rose-950/50 bg-neutral-950/40 backdrop-blur-md p-4 shadow-2xl">
+      {/* Main Content Area with Semi-Transparent Glass Container to Show Marble */}
+      <main className="relative z-10 flex-1 overflow-y-auto p-3 sm:p-4 pb-24">
+        <div className="h-full rounded-2xl border border-rose-900/40 bg-neutral-950/30 backdrop-blur-sm p-4 shadow-2xl">
           {activeTab === 'shopping' && <ShoppingList userId={userId} />}
           {activeTab === 'schedule' && <Schedule userId={userId} />}
           {activeTab === 'todo' && <TodoList userId={userId} />}
@@ -58,12 +60,12 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </div>
       </main>
 
-      {/* Fixed Bottom Navigation Bar (Guaranteed visible on screen) */}
-      <nav aria-label="Main Navigation" className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-rose-950/50 bg-neutral-950/95 backdrop-blur-lg py-3 shadow-[0_-10px_25px_rgba(0,0,0,0.8)]">
-        <button onClick={() => setActiveTab('shopping')} className={`text-xs font-medium transition-all ${activeTab === 'shopping' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
-        <button onClick={() => setActiveTab('schedule')} className={`text-xs font-medium transition-all ${activeTab === 'schedule' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
-        <button onClick={() => setActiveTab('todo')} className={`text-xs font-medium transition-all ${activeTab === 'todo' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
-        <button onClick={() => setActiveTab('chat')} className={`text-xs font-medium transition-all ${activeTab === 'chat' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
+      {/* Larger, Fixed Bottom Navigation Bar (Optimized for iPhone & Android) */}
+      <nav aria-label="Main Navigation" className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-rose-900/50 bg-neutral-950/95 backdrop-blur-xl pt-4 pb-6 px-2 shadow-[0_-15px_30px_rgba(0,0,0,0.9)]">
+        <button onClick={() => setActiveTab('shopping')} className={`text-sm font-medium tracking-wide transition-all py-1 px-3 rounded-full ${activeTab === 'shopping' ? 'text-red-500 font-bold bg-rose-950/40 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
+        <button onClick={() => setActiveTab('schedule')} className={`text-sm font-medium tracking-wide transition-all py-1 px-3 rounded-full ${activeTab === 'schedule' ? 'text-red-500 font-bold bg-rose-950/40 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
+        <button onClick={() => setActiveTab('todo')} className={`text-sm font-medium tracking-wide transition-all py-1 px-3 rounded-full ${activeTab === 'todo' ? 'text-red-500 font-bold bg-rose-950/40 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
+        <button onClick={() => setActiveTab('chat')} className={`text-sm font-medium tracking-wide transition-all py-1 px-3 rounded-full ${activeTab === 'chat' ? 'text-red-500 font-bold bg-rose-950/40 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
       </nav>
 
       {/* Profile Dialog */}
