@@ -392,39 +392,4 @@ function EventDialog({ userId, open, onOpenChange, defaultDate, onCreated }: { u
       </DialogContent>
     </Dialog>
   )
-}
-                   <div key={ev.id} className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]" style={{ borderLeft: `3px solid ${ev.color}` }}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="font-medium text-white">{ev.title}</p>
-                          <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
-                            <Clock className="size-3" aria-hidden="true" />
-                            {timeText}
-                          </p>
-                          {ev.location && (
-                            <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
-                              <MapPin className="size-3" aria-hidden="true" />
-                              {ev.location}
-                            </p>
-                          )}
-                        </div>
-                        {ev.user_id === userId && (
-                          <Button variant="ghost" size="icon-sm" onClick={() => remove(ev.id)} aria-label={`Delete ${ev.title}`} className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30">
-                            <Trash2 />
-                          </Button>
-                        )}
-                      </div>
-                      {ev.description && <p className="mt-2 text-sm text-neutral-300">{ev.description}</p>}
-                      <div className="mt-3">
-                        <MemberBadge profile={profiles[ev.user_id]} />
-                      </div>
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <EventDialog userId={userId} open={dialogOpen} onOpenChange={setDialogOpen
+            }
