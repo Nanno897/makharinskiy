@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { HubHeader as Header } from '@/components/hub/hub-header'
-import { Navigation } from '@/components/hub/navigation'
-import { ShoppingList } from '@/components/hub/shopping-list'
-import { ProfileDialog } from '@/components/hub/profile-dialog'
+import { HubHeader as Header } from './hub-header'
+import { Navigation } from './navigation'
+import { ShoppingList } from './shopping-list'
+import { ProfileDialog } from './profile-dialog'
 
 export interface FamilyHubProps {
   userId: string
