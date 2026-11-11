@@ -54,3 +54,41 @@ export const playCheckoffFeedback = () => {
   triggerHaptic(35) // Light 35ms tap
   playSuccessChime()
 }
+// Warm, lower-toned chime for chat toggle (F3 / A3 pitch)
+export const playChatToggleFeedback = () => {
+  if (typeof window === 'undefined') return
+
+  try {
+    const AudioContext = window.AudioContext || (window as unknown as { webkitAudioContext: typeof window.AudioContext }).webkitAudioContext
+    if (!AudioContext) return
+
+    const ctx = new AudioContext()
+    const now = ctx.currentTime
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    // Smooth sine wave for a soft, rounded tone
+    osc1.type = 'sine'
+    osc2.type = 'sine'
+    
+    // Deeper frequencies (174.61Hz / F3 and 220Hz / A3) instead of high pitch
+    osc1.frequency.setValueAtTime(174.61, now)
+    osc2.frequency.setValueAtTime(220.00, now + 0.04)
+
+    // Gentle gain curve for a subtle background feel
+    gain.gain.setValueAtTime(0.06, now)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3)
+
+    osc1.connect(gain)
+    osc2.connect(gain)
+    gain.connect(ctx.destination)
+
+    osc1.start(now)
+    osc2.start(now + 0.04)
+    osc1.stop(now + 0.3)
+    osc2.stop(now + 0.3)
+  } catch {
+    // Fallback if blocked
+  }
+}
