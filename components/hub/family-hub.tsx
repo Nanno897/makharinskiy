@@ -43,7 +43,7 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       </div>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 overflow-y-auto p-3 sm:p-4 pb-24">
+      <main className="relative z-10 flex-1 overflow-y-auto p-3 sm:p-4 pb-28">
         <div className="h-full bg-transparent p-2 shadow-none">
           {activeTab === 'shopping' && <ShoppingList userId={userId} />}
           {activeTab === 'schedule' && <Schedule userId={userId} />}
@@ -52,39 +52,47 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </div>
       </main>
 
-      {/* Fixed Bottom Navigation Bar */}
+      {/* Floating Glass Navigation Bar */}
       <nav 
         aria-label="Main Navigation" 
-        className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-rose-900/40 bg-neutral-950/90 backdrop-blur-xl pt-4 pb-6 px-2 shadow-[0_-15px_30px_rgba(0,0,0,0.9)]"
+        className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-50 flex items-center justify-around rounded-2xl border border-white/[0.08] bg-neutral-950/60 backdrop-blur-2xl p-2 shadow-[0_15px_35px_rgba(0,0,0,0.85)]"
       >
         <button 
           onClick={() => setActiveTab('shopping')} 
-          className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${
-            activeTab === 'shopping' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'
+          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+            activeTab === 'shopping' 
+              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
           Shopping
         </button>
         <button 
           onClick={() => setActiveTab('schedule')} 
-          className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${
-            activeTab === 'schedule' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'
+          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+            activeTab === 'schedule' 
+              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
           Schedule
         </button>
         <button 
           onClick={() => setActiveTab('todo')} 
-          className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${
-            activeTab === 'todo' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'
+          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+            activeTab === 'todo' 
+              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
           To-Do
         </button>
         <button 
           onClick={() => setActiveTab('chat')} 
-          className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${
-            activeTab === 'chat' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'
+          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+            activeTab === 'chat' 
+              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
           Chat
