@@ -12,16 +12,16 @@ export function ChatCharacters({ isSending = false, className }: ChatCharactersP
   return (
     <div
       className={cn(
-        'pointer-events-none absolute inset-x-0 bottom-16 z-10 flex justify-between px-2 sm:px-3',
+        'pointer-events-none absolute inset-x-0 -bottom-2 z-20 flex justify-between px-1',
         className
       )}
     >
-      {/* Helcurt - Bottom Left */}
+      {/* Helcurt - Outside left */}
       <div
         className={cn(
-          'relative h-16 w-16 sm:h-20 sm:w-20 transition-transform duration-300 opacity-90',
+          'relative h-14 w-14 sm:h-16 sm:w-16 transition-transform duration-300',
           'animate-[float_3s_ease-in-out_infinite]',
-          isSending && 'scale-110 opacity-100'
+          isSending && 'scale-110'
         )}
       >
         <Image
@@ -33,12 +33,12 @@ export function ChatCharacters({ isSending = false, className }: ChatCharactersP
         />
       </div>
 
-      {/* Lunox - Bottom Right */}
+      {/* Lunox - Outside right */}
       <div
         className={cn(
-          'relative h-16 w-16 sm:h-20 sm:w-20 transition-transform duration-300 opacity-90',
+          'relative h-14 w-14 sm:h-16 sm:w-16 transition-transform duration-300',
           'animate-[float_3.4s_ease-in-out_infinite_0.4s]',
-          isSending && 'scale-110 opacity-100'
+          isSending && 'scale-110'
         )}
       >
         <Image
