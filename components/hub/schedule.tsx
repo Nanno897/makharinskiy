@@ -124,7 +124,7 @@ export function Schedule({ userId }: { userId: string }) {
   return (
     <section>
       <SectionHeader title="Family Schedule" subtitle="Shared calendar for everyone">
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={() => setDialogOpen(true)} className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]">
           <CalendarPlus /> New event
         </Button>
       </SectionHeader>
@@ -135,19 +135,32 @@ export function Schedule({ userId }: { userId: string }) {
         <ErrorState onRetry={() => mutate()} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-2xl border border-border bg-card p-4">
+          {/* Smoked-Glass Calendar Container */}
+          <div className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
             <div className="mb-4 flex items-center justify-between">
-              <Button variant="ghost" size="icon" onClick={() => setMonth((m) => addMonths(m, -1))} aria-label="Previous month">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setMonth((m) => addMonths(m, -1))} 
+                aria-label="Previous month"
+                className="text-amber-300 hover:text-amber-200 hover:bg-white/[0.04]"
+              >
                 <ChevronLeft />
               </Button>
-              <h3 className="font-serif text-lg font-semibold" aria-live="polite">
+              <h3 className="font-serif text-lg font-semibold text-white" aria-live="polite">
                 {format(month, 'MMMM yyyy')}
               </h3>
-              <Button variant="ghost" size="icon" onClick={() => setMonth((m) => addMonths(m, 1))} aria-label="Next month">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setMonth((m) => addMonths(m, 1))} 
+                aria-label="Next month"
+                className="text-amber-300 hover:text-amber-200 hover:bg-white/[0.04]"
+              >
                 <ChevronRight />
               </Button>
             </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-medium uppercase tracking-wider text-neutral-400">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
                 <div key={d} className="py-1">
                   {d}
@@ -167,20 +180,23 @@ export function Schedule({ userId }: { userId: string }) {
                     aria-label={`${format(day, 'EEEE, MMMM d')}${holiday ? `, ${holiday}` : ''}${evs.length ? `, ${evs.length} event${evs.length > 1 ? 's' : ''}` : ''}`}
                     aria-pressed={isSel}
                     className={cn(
-                      'flex aspect-square flex-col items-center justify-start gap-1 rounded-lg p-1 text-sm transition-colors sm:p-2',
-                      !isSameMonth(day, month) && 'text-muted-foreground/40',
-                      isSel ? 'bg-primary text-primary-foreground glow-red' : 'hover:bg-accent',
-                      !isSel && isToday(day) && 'ring-1 ring-gold text-gold',
+                      'flex aspect-square flex-col items-center justify-start gap-1 rounded-xl p-1 text-sm transition-all sm:p-2',
+                      !isSameMonth(day, month) && 'text-neutral-600',
+                      isSameMonth(day, month) && !isSel && 'text-neutral-200 hover:bg-white/[0.04]',
+                      isSel && 'bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white font-semibold shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-800/60 scale-105 z-10',
+                      !isSel && isToday(day) && 'ring-1 ring-amber-400/60 text-amber-300',
                     )}
                   >
                     <span className="font-medium">{format(day, 'd')}</span>
                     <span className="flex gap-0.5 items-center">
-                      {holiday && <span className="size-1.5 rounded-full bg-gold" title={holiday} />}
-                      {evs.length > 0 && evs.slice(0, 2).map((ev) => (
+                      {holiday && <span className="size-1.5 rounded-full bg-amber-400" title={holiday} />}
+                      {evs.length > 0 && evs.slice(0, 2).map((_, i) => (
                         <span
-                          key={ev.id}
-                          className="size-1.5 rounded-full"
-                          style={{ backgroundColor: isSel ? '#fff' : ev.color }}
+                          key={i}
+                          className={cn(
+                            "size-1.5 rounded-full",
+                            i === 0 ? "bg-rose-400/90" : i === 1 ? "bg-purple-400/90" : "bg-amber-400/90"
+                          )}
                         />
                       ))}
                     </span>
@@ -191,19 +207,19 @@ export function Schedule({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
               {isToday(selected) ? 'Today' : format(selected, 'EEEE, MMM d')}
             </h3>
             <InlineError message={actionError} />
             
             <div className="flex flex-col gap-2">
               {activeHoliday && (
-                <div className="rounded-xl border border-gold/40 bg-gold/10 p-4">
-                  <div className="flex items-center gap-2 text-gold font-medium">
+                <div className="rounded-2xl border border-amber-500/30 bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+                  <div className="flex items-center gap-2 text-amber-300 font-medium">
                     <Sparkles className="size-4" />
                     <span>{activeHoliday}</span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">German Holiday / Observance</p>
+                  <p className="mt-1 text-xs text-neutral-400">German Holiday / Observance</p>
                 </div>
               )}
 
@@ -213,20 +229,103 @@ export function Schedule({ userId }: { userId: string }) {
                 selectedEvents.map((ev) => (
                   <li
                     key={ev.id}
-                    className="list-none rounded-xl border border-border bg-card p-4"
+                    className="list-none rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
                     style={{ borderLeft: `3px solid ${ev.color}` }}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="font-medium">{ev.title}</p>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <p className="font-medium text-white">{ev.title}</p>
+                        <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
                           <Clock className="size-3" aria-hidden="true" />
                           {ev.all_day
                             ? 'All day'
                             : `${format(parseISO(ev.starts_at), 'h:mm a')}${ev.ends_at ? ` – ${format(parseISO(ev.ends_at), 'h:mm a')}` : ''}`}
                         </p>
                         {ev.location && (
-                          <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
+                            <MapPin className="size-3" aria-hidden="true" />
+                            {ev.location}
+                          </p>
+                        )}
+                      </div>
+                      {ev.user_id === userId && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => remove(ev.id)}
+                          aria-label={`Delete ${ev.title}`}
+                          className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
+                        >
+                          <Trash2 />
+                        </Button>
+                      )}
+                    </div>
+                    {ev.description && <p className="mt-2 text-sm text-neutral-300">{ev.description}</p>}
+                    <div className="mt-3">
+                      <MemberBadge profile={profiles[ev.user_id]} />
+                    </div>
+                  </li>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <EventDialog
+        userId={userId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        defaultDate={selected}
+        onCreated={() => mutate()}
+      />
+    </section>
+  )
+}
+
+function EventDialog({
+  userId,
+  open,
+  onOpenChange,
+  defaultDate,
+  onCreated,
+}: {
+  userId: string
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  defaultDate: Date
+  onCreated: () => void
+}) {
+  const [title, setTitle] = useState('')
+  const [date, setDate] = useState('')
+  const [start, setStart] = useState('18:00')
+  const [end, setEnd] = useState('')
+  const [allDay, setAllDay] = useState(false)
+  const [location, setLocation] = useState('')
+  const [description, setDescription] = useState('')
+  const [color, setColor] = useState(EVENT_COLORS[0])
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [lastOpen, setLastOpen] = useState(open)
+  if (open !== lastOpen) {
+    setLastOpen(open)
+    if (open) {
+      setDate(format(defaultDate, 'yyyy-MM-dd'))
+      setError(null)
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title.trim() || !date) return setError('Title and date are required.')
+    const startsAt = new Date(`${date}T${allDay ? '00:00' : start}`)
+    const endsAt = !allDay && end ? new Date(`${date}T${end}`) : null
+    if (endsAt && endsAt <= startsAt) return setError('End time must be after start time.')
+    setSaving(true)
+    setError(null)
+    const { error } = await createClient()
+                 <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="size-3" aria-hidden="true" />
                             {ev.location}
                           </p>
