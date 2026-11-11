@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ShoppingBag, Calendar, CheckSquare, MessageSquare } from 'lucide-react'
+import { ShoppingCart, Calendar, CheckSquare, MessageSquare } from 'lucide-react'
 import { HubHeader } from '@/components/hub/hub-header'
 import { ShoppingList } from '@/components/hub/shopping-list'
 import { Schedule } from '@/components/hub/schedule'
@@ -53,64 +53,7 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </div>
       </main>
 
-      {/* Floating Glass Navigation Bar */}
+      {/* Floating Glass Navigation Bar (Icons Only) */}
       <nav 
         aria-label="Main Navigation" 
-        className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-50 flex items-center justify-around rounded-2xl border border-white/[0.08] bg-neutral-950/60 backdrop-blur-2xl p-2 shadow-[0_15px_35px_rgba(0,0,0,0.85)]"
-      >
-        <button 
-          onClick={() => setActiveTab('shopping')} 
-          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
-            activeTab === 'shopping' 
-              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <ShoppingBag className="w-4 h-4 text-white" />
-          <span>Shopping</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('schedule')} 
-          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
-            activeTab === 'schedule' 
-              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <Calendar className="w-4 h-4 text-white" />
-          <span>Schedule</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('todo')} 
-          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
-            activeTab === 'todo' 
-              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <CheckSquare className="w-4 h-4 text-white" />
-          <span>To-Do</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('chat')} 
-          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
-            activeTab === 'chat' 
-              ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <MessageSquare className="w-4 h-4 text-white" />
-          <span>Chat</span>
-        </button>
-      </nav>
-
-      {/* Profile Dialog */}
-      <ProfileDialog
-        open={isProfileOpen}
-        onOpenChange={setIsProfileOpen}
-        userId={userId}
-        currentAvatarUrl={avatarUrl}
-      />
-    </div>
-  )
-}
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-2 rounded-2xl border border-white/[0.08] bg-neutral-950/60 backdrop-blur-2xl py-2.5 px-4 shadow-[0_15px_35px
