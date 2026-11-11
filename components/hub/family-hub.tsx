@@ -60,4 +60,21 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </div>
       </main>
 
-      {/* Larger,
+      {/* Fixed Bottom Navigation Bar */}
+      <nav aria-label="Main Navigation" className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-rose-900/40 bg-neutral-950/90 backdrop-blur-xl pt-4 pb-6 px-2 shadow-[0_-15px_30px_rgba(0,0,0,0.9)]">
+        <button onClick={() => setActiveTab('shopping')} className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${activeTab === 'shopping' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
+        <button onClick={() => setActiveTab('schedule')} className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${activeTab === 'schedule' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
+        <button onClick={() => setActiveTab('todo')} className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${activeTab === 'todo' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
+        <button onClick={() => setActiveTab('chat')} className={`text-sm font-medium tracking-wide transition-all py-1.5 px-4 rounded-full ${activeTab === 'chat' ? 'text-red-500 font-bold bg-rose-950/50 scale-105 shadow-inner' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
+      </nav>
+
+      {/* Profile Dialog */}
+      <ProfileDialog
+        open={isProfileOpen}
+        onOpenChange={setIsProfileOpen}
+        userId={userId}
+        currentAvatarUrl={avatarUrl}
+      />
+    </div>
+  )
+}
