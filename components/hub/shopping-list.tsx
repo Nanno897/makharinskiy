@@ -7,6 +7,7 @@ import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EmptyState, ErrorState, ListSkeleton } from './states'
+import { playCheckoffFeedback } from '@/lib/feedback'
 
 export interface ShoppingItem {
   id: string
