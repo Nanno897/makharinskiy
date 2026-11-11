@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { Loader2, MessageCircle, SendHorizontal, Smile } from 'lucide-react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -72,10 +73,36 @@ export function Chat({ userId }: { userId: string }) {
 
   return (
     <section className="flex h-[calc(100svh-16rem)] min-h-[420px] flex-col md:h-[calc(100svh-12rem)]">
-      <SectionHeader title="Family Chat" subtitle="Live with everyone at home" />
+      {/* Header layout with Lunox placed next to the title */}
+      <div className="flex items-center justify-between mb-2 px-1">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white font-serif">
+            Family Chat
+          </h1>
+          <p className="text-sm text-neutral-400">
+            Live with everyone at home
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            'relative h-14 w-14 sm:h-16 sm:w-16 transition-transform duration-300',
+            'animate-[float_3.4s_ease-in-out_infinite_0.4s]',
+            sending && 'scale-110'
+          )}
+        >
+          <Image
+            src="/lunox-chibi.png"
+            alt="Lunox"
+            fill
+            className="object-contain drop-shadow-[0_0_12px_rgba(147,51,234,0.45)]"
+            priority
+          />
+        </div>
+      </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-        {/* Helcurt & Lunox characters */}
+        {/* Helcurt character at the bottom */}
         <ChatCharacters isSending={sending} />
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-label="Messages">
