@@ -16,16 +16,60 @@ export function HubBackground({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-[calc(100vh-140px)] rounded-2xl border border-rose-950/40 bg-gradient-to-b from-neutral-900 via-neutral-950 to-neutral-950 p-4 sm:p-6 shadow-2xl overflow-hidden flex flex-col justify-between">
       <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet" />
+      
       <div className="relative z-10 flex-1 flex flex-col">{children}</div>
-      <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-75 translate-x-3 translate-y-3">
-        <svg width="180" height="180" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g transform="rotate(-15 100 100)">
-            <path d="M120 180 Q150 140 180 100" stroke="#881337" strokeWidth="3" strokeLinecap="round" />
-            <path d="M140 160 Q170 120 190 80" stroke="#9f1239" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="170" cy="95" r="12" fill="#9f1239" />
-            <circle cx="158" cy="85" r="10" fill="#be123c" />
-            <circle cx="182" cy="85" r="10" fill="#881337" />
-            <circle cx="170" cy="75" r="11" fill="#e11d48" />
-            <circle cx="170" cy="90" r="4" fill="#fbbf24" />
-            <circle cx="135" cy="140" r="14" fill="#881337" />
-            <circle cx="120" cy="130" r="11" fill="#9f
+
+      {/* Red Floral Corner Accent */}
+      <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-70 flex gap-1 p-4">
+        <div className="size-10 rounded-full bg-rose-900 blur-sm" />
+        <div className="size-8 rounded-full bg-red-700 blur-xs mt-4 -ml-4" />
+        <div className="size-6 rounded-full bg-rose-800 blur-xs -mt-2 -ml-2" />
+      </div>
+    </div>
+  )
+}
+
+export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
+  const [activeTab, setActiveTab] = useState<'shopping' | 'schedule' | 'todo' | 'chat'>('shopping')
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+
+  return (
+    <div className="flex h-[100dvh] flex-col bg-black text-white overflow-hidden">
+      <Header
+        onOpenProfile={() => setIsProfileOpen(true)}
+        userName={userName}
+        avatarUrl={avatarUrl}
+      />
+
+      <main className="flex-1 overflow-y-auto p-4">
+        <HubBackground>
+          {activeTab === 'shopping' && <ShoppingList userId={userId} />}
+          {activeTab === 'schedule' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">Schedule & Calendar</h3>
+            </div>
+          )}
+          {activeTab === 'todo' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">To-Do Tasks</h3>
+            </div>
+          )}
+          {activeTab === 'chat' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
+              <h3 className="text-xl font-semibold text-white mb-2">Family Chat</h3>
+            </div>
+          )}
+        </HubBackground>
+      </main>
+
+      <Navigation activeTab={activeTab} onTabChange={(tab: any) => setActiveTab(tab)} />
+
+      <ProfileDialog
+        open={isProfileOpen}
+        onOpenChange={setIsProfileOpen}
+        userId={userId}
+        currentAvatarUrl={avatarUrl}
+      />
+    </div>
+  )
+}
