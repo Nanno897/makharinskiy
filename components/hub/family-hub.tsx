@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { HubHeader as Header } from './hub-header'
-import { Navigation } from './navigation'
-import { ShoppingList } from './shopping-list'
-import { ProfileDialog } from './profile-dialog'
+import { HubHeader } from '@/components/hub/hub-header'
+import { Navigation } from '@/components/hub/navigation'
+import { ShoppingList } from '@/components/hub/shopping-list'
+import { ProfileDialog } from '@/components/hub/profile-dialog'
 
 export interface FamilyHubProps {
   userId: string
@@ -35,7 +35,7 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
 
   return (
     <div className="flex h-[100dvh] flex-col bg-black text-white overflow-hidden">
-      <Header
+      <HubHeader
         onOpenProfile={() => setIsProfileOpen(true)}
         userName={userName}
         avatarUrl={avatarUrl}
