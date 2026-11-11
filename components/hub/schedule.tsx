@@ -334,3 +334,25 @@ function EventDialog({
     </Dialog>
   )
 }
+// Helper to check if a specific date is a German holiday
+function getGermanHoliday(date: Date): string | null {
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // 1-12
+  const year = date.getFullYear();
+
+  // Fixed date official holidays
+  if (month === 1 && day === 1) return "Neujahr (New Year)";
+  if (month === 5 && day === 1) return "Tag der Arbeit";
+  if (month === 10 && day === 3) return "Tag der Deutschen Einheit";
+  if (month === 12 && day === 25) return "1. Weihnachtsfeiertag";
+  if (month === 12 && day === 26) return "2. Weihnachtsfeiertag";
+
+  // Unofficial holidays & observances
+  if (month === 2 && day === 14) return "Valentinstag";
+  if (month === 10 && day === 31) return "Halloween";
+  if (month === 12 && day === 6) return "Nikolaus";
+  if (month === 12 && day === 31) return "Silvester";
+
+  // Dynamic Easter-based holidays calculation can also be plugged in here
+  return null;
+}
