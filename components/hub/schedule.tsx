@@ -235,6 +235,143 @@ export function Schedule({ userId }: { userId: string }) {
                       {ev.user_id === userId && (
                         <Button
                           variant="ghost"
+                          size="icon-sm"
+                          onClick={() => remove(ev.id)}
+                          aria-label={`Delete ${ev.title}`}
+                          className="text-muted-foreground hover:text-red-500"
+                        >
+                          <Trash2 />
+                        </Button>
+                      )}
+                    </div>
+                    {ev.description && <p className="mt-2 text-sm text-muted-foreground">{ev.description}</p>}
+                    <div className="mt-3">
+                      <MemberBadge profile={profiles[ev.user_id]} />
+                    </div>
+                  </li>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <EventDialog
+        userId={userId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        defaultDate={selected}
+        onCreated={() => mutate()}
+      />
+    </section>
+  )
+}
+
+function EventDialog({
+  userId,
+  open,
+  onOpenChange,
+  defaultDate,
+  onCreated,
+}: {
+  userId: string
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  defaultDate: Date
+  onCreated: () => void
+}) {
+  const [title, setTitle] = useState('')
+  const [date, setDate] = useState('')
+  const [start, setStart] = useState('18:00')
+  const [end, setEnd] = useState('')
+  const [allDay, setAllDay] = useState(false)
+  const [location, setLocation] = useState('')
+  const [description, setDescription] = useState('')
+  const [color, setColor] = useState(EVENT_COLORS[0])
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [lastOpen, setLastOpen] = useState(open)
+  if (open !== lastOpen) {
+    setLastOpen(open)
+    if (open) {
+      setDate(format(defaultDate, 'yyyy-MM-dd'))
+      setError(null)
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title.trim() || !date) return setError('Title and date are required.')
+    const startsAt = new Date(`${date}T${allDay ? '00:00' : start}`)
+    const endsAt = !allDay && end ? new Date(`${date}T${end}`) : null
+    if (endsAt && endsAt <= startsAt) return setError('End time must be after start time.')
+    setSaving(true)
+    setError(null)
+    const { error } = await createClient()
+      .from('events')
+      .insert({
+        title: title.trim(),
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt?.toISOString() ?? null,
+        all_day: allDay,
+        location: location.trim() || null,
+        description: description.trim() || null,
+        color,
+        user_id: userId,
+      })
+    setSaving(false)
+    if (error) return setError(friendlyError(error))
+    setTitle('')
+    setLocation('')
+    setDescription('')
+    setEnd('')
+    onCreated()
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="border border-border bg-card sm:max-w-md">
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">New event</DialogTitle>
+            <DialogDescription>Add something to the family calendar.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <Label htmlFor="ev-title">Title</Label>
+            <Input id="ev-title" required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2 grid gap-2">
+              <Label htmlFor="ev-date">Date</Label>
+              <Input id="ev-date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="[color-scheme:dark]" />
+            </div>
+            {!allDay && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="ev-start">Start</Label>
+                  <Input id="ev-start" type="time" value={start} onChange={(e) => setStart(e.target.value)} className="[color-scheme:dark]" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="ev-end">End (optional)</Label>
+                  <Input id="ev-end" type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="[color-scheme:dark]" />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="ev-allday" checked={allDay} onCheckedChange={(v) => setAllDay(v === true)} />
+            <Label htmlFor="ev-allday">
+                 <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin className="size-3" aria-hidden="true" />
+                            {ev.location}
+                          </p>
+                        )}
+                      </div>
+                      {ev.user_id === userId && (
+                        <Button
+                          variant="ghost"
                           size="icon
 m() || null,
         color,
