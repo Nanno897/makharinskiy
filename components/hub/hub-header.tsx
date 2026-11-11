@@ -59,34 +59,36 @@ export function HubHeader({
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-rose-950/40 shadow-lg">
+    <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-white/[0.06] shadow-lg">
       <div className="flex items-center gap-3">
         <div className="scale-110 origin-left">
           <Crest />
         </div>
         <div>
           <h1 className="text-white font-serif text-lg sm:text-xl font-bold leading-tight tracking-wide">Makharinskiy</h1>
-          <span className="text-[11px] font-medium tracking-[0.2em] text-rose-400/80">FAMILY HUB</span>
+          <span className="text-[11px] font-medium tracking-[0.2em] text-amber-400/80">FAMILY HUB</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
+        {/* Profile photo inside a thin gold ring */}
         <button
           type="button"
           onClick={onOpenProfile}
-          className="rounded-full p-0.5 transition-transform active:scale-95 hover:ring-2 hover:ring-rose-500/50"
+          className="rounded-full p-0.5 transition-transform active:scale-95 hover:ring-2 hover:ring-amber-400/50"
           title="Open Profile Settings"
           aria-label="Open Profile Settings"
         >
           <MemberAvatar profile={currentProfile} userId={userId} gold size="md" />
         </button>
 
+        {/* Notifications in muted gold */}
         <Button
           variant="ghost"
           size="icon"
           onClick={requestPermission}
           title="Enable Push Notifications"
-          className="text-amber-400 hover:text-amber-300 size-10"
+          className="text-amber-400/80 hover:text-amber-300 hover:bg-white/[0.04] size-10 rounded-xl"
         >
           <Bell className="h-5 w-5" />
         </Button>
@@ -96,7 +98,7 @@ export function HubHeader({
           size="icon" 
           onClick={signOut} 
           disabled={signingOut}
-          className="text-neutral-400 hover:text-white size-10"
+          className="text-neutral-400 hover:text-white hover:bg-white/[0.04] size-10 rounded-xl"
           title="Sign out"
         >
           {signingOut ? (
