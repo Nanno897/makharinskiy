@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Playfair_Display } from 'next/font/google'
 import { ServiceWorkerRegister } from '@/components/service-worker-register'
+import NotificationListener from '@/components/NotificationListener'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
@@ -40,6 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${geist.variable} ${playfair.variable}`}>
       <body className="min-h-svh antialiased">
+        <NotificationListener />
         {children}
         <ServiceWorkerRegister />
         {process.env.NODE_ENV === 'production' && <Analytics />}
