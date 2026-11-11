@@ -10,5 +10,9 @@ export default async function Home() {
 
   if (!user) redirect('/auth/login')
 
-  return <FamilyHub userId={user.id} email={user.email} />
+  return (
+    <div className="h-screen w-full flex flex-col bg-neutral-950 overflow-hidden">
+      <FamilyHub userId={user.id} email={user.email} />
+    </div>
+  )
 }
