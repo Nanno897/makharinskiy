@@ -54,6 +54,28 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       </main>
 
       {/* Floating Glass Navigation Bar (Icons Only) */}
-      <nav 
-        aria-label="Main Navigation" 
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-2 rounded-2xl border border-white/[0.08] bg-neutral-950/60 backdrop-blur-2xl py-2.5 px-4 shadow-[0_15px_35px
+      <nav aria-label="Main Navigation" className="absolute bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-2 rounded-2xl border border-white/[0.08] bg-neutral-950/60 backdrop-blur-2xl py-2.5 px-4 shadow-[0_15px_35px_rgba(0,0,0,0.85)]">
+        <button onClick={() => setActiveTab('shopping')} aria-label="Shopping" className={`p-3 rounded-xl transition-all ${activeTab === 'shopping' ? 'text-white bg-rose-950/60 shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-900/40 scale-105' : 'text-white/60 hover:text-white hover:bg-white/[0.04]'}`}>
+          <ShoppingCart className="w-5 h-5" />
+        </button>
+        <button onClick={() => setActiveTab('schedule')} aria-label="Schedule" className={`p-3 rounded-xl transition-all ${activeTab === 'schedule' ? 'text-white bg-rose-950/60 shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-900/40 scale-105' : 'text-white/60 hover:text-white hover:bg-white/[0.04]'}`}>
+          <Calendar className="w-5 h-5" />
+        </button>
+        <button onClick={() => setActiveTab('todo')} aria-label="To-Do" className={`p-3 rounded-xl transition-all ${activeTab === 'todo' ? 'text-white bg-rose-950/60 shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-900/40 scale-105' : 'text-white/60 hover:text-white hover:bg-white/[0.04]'}`}>
+          <CheckSquare className="w-5 h-5" />
+        </button>
+        <button onClick={() => setActiveTab('chat')} aria-label="Chat" className={`p-3 rounded-xl transition-all ${activeTab === 'chat' ? 'text-white bg-rose-950/60 shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-900/40 scale-105' : 'text-white/60 hover:text-white hover:bg-white/[0.04]'}`}>
+          <MessageSquare className="w-5 h-5" />
+        </button>
+      </nav>
+
+      {/* Profile Dialog */}
+      <ProfileDialog
+        open={isProfileOpen}
+        onOpenChange={setIsProfileOpen}
+        userId={userId}
+        currentAvatarUrl={avatarUrl}
+      />
+    </div>
+  )
+}
