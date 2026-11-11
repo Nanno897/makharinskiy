@@ -21,18 +21,18 @@ export function ProfileDialog({
   onOpenChange: (o: boolean) => void
 }) {
   const router = useRouter()
-  const { profiles, isLoading: profilesLoading } = useProfiles()
-  const me = profiles[userId]
+  const { profiles = {}, isLoading: profilesLoading } = useProfiles() || {}
+  const me = profiles?.[userId]
   const [signingOut, setSigningOut] = useState(false)
   const [view, setView] = useState<'profile' | 'members'>('profile')
 
-  const { data: todos } = useRealtimeTable<TodoItem>('todo_items')
-  const { data: events } = useRealtimeTable<FamilyEvent>('events')
-  const { data: shopping } = useRealtimeTable<ShoppingItem>('shopping_items')
+  const { data: todos = [] } = useRealtimeTable<TodoItem>('todo_items') || {}
+  const { data: events = [] } = useRealtimeTable<FamilyEvent>('events') || {}
+  const { data: shopping = [] } = useRealtimeTable<ShoppingItem>('shopping_items') || {}
 
-  const myTodos = todos?.filter((t) => t.user_id === userId && !t.completed).length ?? 0
-  const myEvents = events?.filter((e) => e.user_id === userId).length ?? 0
-  const myShopping = shopping?.filter((s) => s.user_id === userId && !s.bought).length ?? 0
+  const myTodos = Array.isArray(todos) ? todos.filter((t) => t?.user_id === userId && !t?.completed).length : 0
+  const myEvents = Array.isArray(events) ? events.filter((e) => e?.user_id === userId).length : 0
+  const myShopping = Array.isArray(shopping) ? shopping.filter((s) => s?.user_id === userId && !s?.bought).length : 0
 
   async function signOut() {
     triggerHaptic(20)
@@ -44,7 +44,7 @@ export function ProfileDialog({
 
   const requestPermission = async () => {
     triggerHaptic(10)
-    if (!('Notification' in window)) {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
       alert('Notifications are not supported on this device/browser.')
       return
     }
@@ -63,6 +63,7 @@ export function ProfileDialog({
 
   const handleShare = async () => {
     triggerHaptic(10)
+    if (typeof window === 'undefined') return
     if (navigator.share) {
       try {
         await navigator.share({
@@ -78,7 +79,7 @@ export function ProfileDialog({
     }
   }
 
-  const memberList = Object.values(profiles)
+  const memberList = profiles ? Object.values(profiles) : []
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setView('profile'); }}>
@@ -203,10 +204,11 @@ export function ProfileDialog({
               ) : !memberList.length ? (
                 <div className="py-8 text-center text-xs text-neutral-400">No other members registered yet.</div>
               ) : (
-                memberList.map((m) => {
-                  const openTasks = todos?.filter((t) => t.user_id === m.id && !t.completed).length ?? 0
-                  const upcomingEvents = events?.filter((e) => e.user_id === m.id).length ?? 0
-                  const itemsNeeded = shopping?.filter((s) => s.user_id === m.id && !s.bought).length ?? 0
+                memberList.map((m: any) => {
+                  if (!m?.id) return null
+                  const openTasks = Array.isArray(todos) ? todos.filter((t) => t?.user_id === m.id && !t?.completed).length : 0
+                  const upcomingEvents = Array.isArray(events) ? events.filter((e) => e?.user_id === m.id).length : 0
+                  const itemsNeeded = Array.isArray(shopping) ? shopping.filter((s) => s?.user_id === m.id && !s?.bought).length : 0
 
                   return (
                     <div
