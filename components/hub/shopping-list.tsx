@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, FileText, Check, X } from 'lucide-react'
+import { Plus, Trash2, FileText, Check, X, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -67,6 +67,12 @@ export function ShoppingList({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-4">
+      {/* Title Header */}
+      <div className="flex items-center gap-2 pb-1 border-b border-neutral-800">
+        <ShoppingCart className="size-5 text-red-500" />
+        <h2 className="text-lg font-semibold text-white">Shopping List</h2>
+      </div>
+
       {/* Input form for adding new item & quantity */}
       <form onSubmit={handleAddItem} className="flex gap-2">
         <Input
@@ -143,51 +149,3 @@ export function ShoppingList({ userId }: { userId: string }) {
                     className="size-8 text-neutral-400 hover:text-red-400 hover:bg-neutral-800"
                   >
                     <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Display existing note if not editing */}
-              {item.note && editingNoteId !== item.id && (
-                <p className="text-xs text-neutral-400 bg-neutral-950/60 p-2 rounded border border-neutral-850 italic">
-                  Note: {item.note}
-                </p>
-              )}
-
-              {/* Inline Note Editor */}
-              {editingNoteId === item.id && (
-                <div className="flex items-center gap-2 pt-1">
-                  <Input
-                    type="text"
-                    placeholder="Add a note (brand, size, etc.)..."
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    className="flex-1 h-8 text-xs bg-neutral-950 border-neutral-700 text-white"
-                    autoFocus
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    onClick={() => saveNote(item.id)}
-                    className="size-8 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-                  >
-                    <Check className="size-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingNoteId(null)}
-                    className="size-8 text-neutral-400 hover:bg-neutral-800 shrink-0"
-                  >
-                    <X className="size-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  )
-}
