@@ -1,5 +1,5 @@
-const CACHE = 'family-hub-v1'
-const OFFLINE_ASSETS = ['/icon-512.png']
+const CACHE = 'MAKHARINSKIY'
+const OFFLINE_ASSETS = ['/logo.jpg']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(OFFLINE_ASSETS)))
@@ -32,3 +32,29 @@ self.addEventListener('fetch', (event) => {
       .catch(() => caches.match(request).then((cached) => cached || Response.error())),
   )
 })
+
+self.addEventListener('push', function (event) {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/logo.jpg',
+      badge: '/logo.jpg',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '2',
+      },
+    };
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'MAKHARINSKIY', options)
+    );
+  }
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/')
+  );
+});
