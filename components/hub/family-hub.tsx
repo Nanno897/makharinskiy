@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { ShoppingBag, Calendar, CheckSquare, MessageSquare } from 'lucide-react'
 import { HubHeader } from '@/components/hub/hub-header'
 import { ShoppingList } from '@/components/hub/shopping-list'
 import { Schedule } from '@/components/hub/schedule'
@@ -59,43 +60,47 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       >
         <button 
           onClick={() => setActiveTab('shopping')} 
-          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
             activeTab === 'shopping' 
               ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          Shopping
+          <ShoppingBag className="w-4 h-4 text-white" />
+          <span>Shopping</span>
         </button>
         <button 
           onClick={() => setActiveTab('schedule')} 
-          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
             activeTab === 'schedule' 
               ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          Schedule
+          <Calendar className="w-4 h-4 text-white" />
+          <span>Schedule</span>
         </button>
         <button 
           onClick={() => setActiveTab('todo')} 
-          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
             activeTab === 'todo' 
               ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          To-Do
+          <CheckSquare className="w-4 h-4 text-white" />
+          <span>To-Do</span>
         </button>
         <button 
           onClick={() => setActiveTab('chat')} 
-          className={`text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-4 rounded-xl ${
+          className={`flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide transition-all py-2 px-3 sm:px-4 rounded-xl ${
             activeTab === 'chat' 
               ? 'text-rose-200 font-semibold bg-rose-950/50 shadow-[0_0_20px_rgba(159,18,57,0.45)] border border-rose-900/40 scale-105' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          Chat
+          <MessageSquare className="w-4 h-4 text-white" />
+          <span>Chat</span>
         </button>
       </nav>
 
