@@ -40,11 +40,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`dark ${geist.variable} ${playfair.variable}`}>
-      <body className="min-h-svh antialiased">
-        <NotificationListener />
-        {children}
-        <ServiceWorkerRegister />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+      <body className="relative min-h-svh antialiased bg-black text-neutral-100 overflow-x-hidden">
+        
+        {/* Layer 1: Subtle smoky burgundy radial gradient base */}
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(65,10,20,0.45)_0%,rgba(10,5,8,0.85)_60%,rgba(0,0,0,1)_100%)] pointer-events-none z-0" />
+
+        {/* Layer 2: Soft blurred red light in two corners */}
+        <div className="fixed -top-32 -left-32 w-[450px] h-[450px] bg-red-950/30 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="fixed -bottom-32 -right-32 w-[450px] h-[450px] bg-red-900/20 rounded-full blur-[140px] pointer-events-none z-0" />
+
+        {/* Layer 3: Faint glass-like texture & barely visible gold accents */}
+        <div className="fixed inset-0 bg-neutral-950/30 backdrop-blur-[2px] border border-amber-500/[0.03] pointer-events-none z-0" />
+
+        {/* Main Application Container */}
+        <div className="relative z-10 flex min-h-svh flex-col">
+          <NotificationListener />
+          {children}
+          <ServiceWorkerRegister />
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </div>
+
       </body>
     </html>
   )
