@@ -6,7 +6,6 @@ import { Loader2, LogOut, Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Button } from '@/components/ui/button'
-import { Crest } from '@/components/crest'
 import { MemberAvatar } from './member-avatar'
 
 export function HubHeader({
@@ -61,8 +60,9 @@ export function HubHeader({
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-white/[0.06] shadow-lg">
       <div className="flex items-center gap-3">
-        <div className="scale-110 origin-left">
-          <Crest />
+        {/* Big M Logo without ring */}
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/20 via-neutral-900 to-neutral-950 border border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+          <span className="font-serif text-2xl font-bold text-amber-300">M</span>
         </div>
         <div>
           <h1 className="text-white font-serif text-lg sm:text-xl font-bold leading-tight tracking-wide">Makharinskiy</h1>
