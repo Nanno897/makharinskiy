@@ -1,10 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { HubHeader } from './hub-header'
-import { Navigation } from './navigation'
-import { ShoppingList } from './shopping-list'
-import { ProfileDialog } from './profile-dialog'
+import { HubHeader } from '@/components/hub/hub-header'
+import { ShoppingList } from '@/components/hub/shopping-list'
+import { ProfileDialog } from '@/components/hub/profile-dialog'
 
 export interface FamilyHubProps {
   userId: string
@@ -62,7 +61,13 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </HubBackground>
       </main>
 
-      <Navigation activeTab={activeTab} onTabChange={(tab: any) => setActiveTab(tab)} />
+      {/* Bottom Navigation Bar */}
+      <nav aria-label="Main Navigation" className="flex items-center justify-around border-t border-neutral-800 bg-neutral-950 py-3">
+        <button onClick={() => setActiveTab('shopping')} className={`text-xs font-medium transition-colors ${activeTab === 'shopping' ? 'text-red-500 font-bold' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
+        <button onClick={() => setActiveTab('schedule')} className={`text-xs font-medium transition-colors ${activeTab === 'schedule' ? 'text-red-500 font-bold' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
+        <button onClick={() => setActiveTab('todo')} className={`text-xs font-medium transition-colors ${activeTab === 'todo' ? 'text-red-500 font-bold' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
+        <button onClick={() => setActiveTab('chat')} className={`text-xs font-medium transition-colors ${activeTab === 'chat' ? 'text-red-500 font-bold' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
+      </nav>
 
       <ProfileDialog
         open={isProfileOpen}
