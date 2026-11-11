@@ -31,7 +31,6 @@ import { cn } from '@/lib/utils'
 
 const EVENT_COLORS = ['#dc2626', '#eab308', '#f59e0b', '#3b82f6', '#10b981', '#a855f7']
 
-// Helper to calculate Easter Sunday for moveable German holidays
 function getEasterSunday(year: number): Date {
   const a = year % 19
   const b = Math.floor(year / 100)
@@ -133,7 +132,6 @@ export function Schedule({ userId }: { userId: string }) {
         <ErrorState onRetry={() => mutate()} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          {/* Smoked-Glass Calendar Container */}
           <div className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
             <div className="mb-4 flex items-center justify-between">
               <Button 
@@ -188,42 +186,8 @@ export function Schedule({ userId }: { userId: string }) {
                     <span className="font-medium">{format(day, 'd')}</span>
                     <span className="flex gap-0.5 items-center">
                       {holiday && <span className="size-1.5 rounded-full bg-amber-400" title={holiday} />}
-                      {evs.length > 0 && evs.slice(0, 2).map((_, i) => (
-                        <span
-                          key={i}
-                          className={cn(
-                            "size-1.5 rounded-full",
-                            i === 0 ? "bg-rose-400/90" : i === 1 ? "bg-purple-400/90" : "bg-amber-400/90"
-                          )}
-                        />
-                      ))}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="
-Events.map((ev) => (
-                  <li
-                    key={ev.id}
-                    className="list-none rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-                    style={{ borderLeft: `3px solid ${ev.color}` }}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-medium text-white">{ev.title}</p>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
-                          <Clock className="size-3" aria-hidden="true" />
-                          {ev.all_day
-                            ? 'All day'
-                            : `${format(parseISO(ev.starts_at), 'h:mm a')}${ev.ends_at ? ` – ${format(parseISO(ev.ends_at), 'h:mm a')}` : ''}`}
-                        </p>
-                        {ev.location && (
-                          <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
-                            <MapPin className="size-3" aria-hidden="true" />
+                      {evs.length > 0 && evs.slice(0, 2).map((_,
+" aria-hidden="true" />
                             {ev.location}
                           </p>
                         )}
