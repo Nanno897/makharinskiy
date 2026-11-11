@@ -12,6 +12,41 @@ import { Label } from '@/components/ui/label'
 import { MemberAvatar } from './member-avatar'
 import { cn } from '@/lib/utils'
 
+// Client-side helper to resize and compress large images before uploading
+async function compressImage(file: File, maxSide = 600, quality = 0.85): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      let { width, height } = img
+      if (width > maxSide || height > maxSide) {
+        if (width > height) {
+          height = Math.round((height * maxSide) / width)
+          width = maxSide
+        } else {
+          width = Math.round((width * maxSide) / height)
+          height = maxSide
+        }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return reject(new Error('Canvas context unavailable'))
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob)
+          else reject(new Error('Image compression failed'))
+        },
+        'image/webp',
+        quality
+      )
+    }
+    img.onerror = () => reject(new Error('Failed to load image file'))
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 export function ProfileDialog({
   userId,
   open,
@@ -42,19 +77,22 @@ export function ProfileDialog({
 
   async function handleUpload(file: File) {
     if (!file.type.startsWith('image/')) return setError('Please choose an image file.')
-    if (file.size > 2 * 1024 * 1024) return setError('Image must be smaller than 2 MB.')
     setUploading(true)
     setError(null)
     try {
+      // Compress/resize file automatically
+      const compressedBlob = await compressImage(file, 600, 0.85)
       const supabase = createClient()
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'png'
-      const path = `${userId}/${Date.now()}.${ext}`
-      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
+      const path = `${userId}/${Date.now()}.webp`
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(path, compressedBlob, { upsert: true, contentType: 'image/webp' })
       if (error) throw error
-      setAvatarUrl(supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl)
+      const publicUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl
+      setAvatarUrl(publicUrl)
     } catch (err) {
       console.error('Upload error:', err)
-      setError('Upload failed. Try a smaller image or paste a URL.')
+      setError('Upload failed. Please try a different photo or URL.')
     } finally {
       setUploading(false)
     }
@@ -88,11 +126,11 @@ export function ProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-gold/20 bg-card sm:max-w-md">
+      <DialogContent className="border border-rose-900/40 bg-neutral-950 text-white sm:max-w-md">
         <form onSubmit={handleSave} className="grid gap-5">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">Profile settings</DialogTitle>
-            <DialogDescription>How the family sees you across the hub.</DialogDescription>
+            <DialogDescription className="text-neutral-400">How the family sees you across the hub.</DialogDescription>
           </DialogHeader>
 
           <div className="flex items-center gap-4">
@@ -101,7 +139,7 @@ export function ProfileDialog({
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif"
+                accept="image/*"
                 className="sr-only"
                 aria-label="Upload avatar image"
                 onChange={(e) => {
@@ -112,10 +150,10 @@ export function ProfileDialog({
               />
               <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
                 {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
-                Upload photo
+                {uploading ? 'Processing...' : 'Upload photo'}
               </Button>
               {avatarUrl && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => setAvatarUrl('')}>
+                <Button type="button" variant="ghost" size="sm" onClick={() => setAvatarUrl('')} className="text-neutral-400 hover:text-white">
                   Remove photo
                 </Button>
               )}
@@ -131,12 +169,13 @@ export function ProfileDialog({
               maxLength={1000}
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
+              className="bg-neutral-900 border-neutral-800 text-white"
             />
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="display-name-edit">Display name</Label>
-            <Input id="display-name-edit" required maxLength={40} value={name} onChange={(e) => setName(e.target.value)} />
+            <Input id="display-name-edit" required maxLength={40} value={name} onChange={(e) => setName(e.target.value)} className="bg-neutral-900 border-neutral-800 text-white" />
           </div>
 
           <fieldset className="grid gap-2">
@@ -150,7 +189,7 @@ export function ProfileDialog({
                   aria-label={`Badge color ${c}`}
                   aria-pressed={color === c}
                   className={cn(
-                    'grid size-8 place-items-center rounded-full ring-offset-2 ring-offset-card transition',
+                    'grid size-8 place-items-center rounded-full ring-offset-2 ring-offset-neutral-950 transition',
                     color === c ? 'ring-2 ring-white' : 'hover:scale-110',
                   )}
                   style={{ backgroundColor: c }}
@@ -168,10 +207,10 @@ export function ProfileDialog({
           )}
 
           <DialogFooter className="bg-transparent">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="text-neutral-400 hover:text-white">
               Cancel
             </Button>
-            <Button type="submit" disabled={saving || uploading}>
+            <Button type="submit" disabled={saving || uploading} className="bg-red-600 hover:bg-red-700 text-white">
               {saving && <Loader2 className="animate-spin" />}
               Save profile
             </Button>
