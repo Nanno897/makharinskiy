@@ -9,7 +9,6 @@ import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MemberAvatar } from './member-avatar'
 import { triggerHaptic } from '@/lib/feedback'
-import type { TodoItem, FamilyEvent, ShoppingItem } from '@/lib/types'
 
 export function ProfileDialog({
   userId,
@@ -21,14 +20,18 @@ export function ProfileDialog({
   onOpenChange: (o: boolean) => void
 }) {
   const router = useRouter()
-  const { profiles = {}, isLoading: profilesLoading } = useProfiles() || {}
+  const profilesResult = useProfiles() || {}
+  const profiles = profilesResult.profiles || {}
+  const profilesLoading = profilesResult.isLoading || false
   const me = profiles?.[userId]
+  
   const [signingOut, setSigningOut] = useState(false)
   const [view, setView] = useState<'profile' | 'members'>('profile')
 
-  const { data: todos = [] } = useRealtimeTable<TodoItem>('todo_items') || {}
-  const { data: events = [] } = useRealtimeTable<FamilyEvent>('events') || {}
-  const { data: shopping = [] } = useRealtimeTable<ShoppingItem>('shopping_items') || {}
+  // Using your exact Supabase table names: 'todos' and 'shopping_list'
+  const { data: todos = [] } = useRealtimeTable<any>('todos') || {}
+  const { data: events = [] } = useRealtimeTable<any>('events') || {}
+  const { data: shopping = [] } = useRealtimeTable<any>('shopping_list') || {}
 
   const myTodos = Array.isArray(todos) ? todos.filter((t) => t?.user_id === userId && !t?.completed).length : 0
   const myEvents = Array.isArray(events) ? events.filter((e) => e?.user_id === userId).length : 0
@@ -208,6 +211,49 @@ export function ProfileDialog({
                   if (!m?.id) return null
                   const openTasks = Array.isArray(todos) ? todos.filter((t) => t?.user_id === m.id && !t?.completed).length : 0
                   const upcomingEvents = Array.isArray(events) ? events.filter((e) => e?.user_id === m.id).length : 0
+                  const itemsNeeded = Array.isArray(shopping) ? shopping.filter((s) => s?.user_id === m.id && !s?.bought).length : 0
+
+                  return (
+                    <div
+                      key={m.id}
+                      className="flex flex-col gap-2 rounded-2xl border border-white/[0.06] bg-neutral-900/40 p-3.5 backdrop-blur-md shadow-md"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <MemberAvatar profile={m} userId={m.id} size="md" />
+                          <div>
+                            <p className="font-medium text-sm text-white">{m.display_name || 'Family Member'}</p>
+                            <p className="text-[11px] text-amber-400/80 font-mono">Member Account</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-1 grid grid-cols-3 gap-1.5 pt-2 border-t border-white/[0.04] text-xs text-neutral-400">
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="size-3.5 text-neutral-400" />
+                          <span>{openTasks} tasks</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="size-3.5 text-amber-400/80" />
+                          <span>{upcomingEvents} events</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <ShoppingBag className="size-3.5 text-rose-400/80" />
+                          <span>{itemsNeeded} items</span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+= m.id).length : 0
                   const itemsNeeded = Array.isArray(shopping) ? shopping.filter((s) => s?.user_id === m.id && !s?.bought).length : 0
 
                   return (
