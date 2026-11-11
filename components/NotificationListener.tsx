@@ -10,8 +10,9 @@ const supabase = createClient(
 
 export default function NotificationListener() {
   useEffect(() => {
+    // Request permission explicitly
     if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default') {
+      if (Notification.permission !== 'granted') {
         Notification.requestPermission()
       }
     }
@@ -20,29 +21,22 @@ export default function NotificationListener() {
       .channel('family-hub-realtime')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload: any) => {
-          if (Notification.permission === 'granted') {
-            new Notification('Makharinskiy Hub: New Message', {
-              body: payload.new.content || 'Someone sent a message!',
-              icon: '/icon.png',
-            })
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'shopping_list' },
         (payload: any) => {
+          // Fallback visual alert so you see it instantly on screen even if browser notification blocks it
+          alert(`Realtime Triggered! New item: ${payload.new.name || 'Check list'}`)
+
           if (Notification.permission === 'granted') {
             new Notification('Makharinskiy Hub: Shopping List', {
               body: `New item added: ${payload.new.name || 'Check the list'}`,
-              icon: '/icon.png',
+              icon: '/logo.jpg',
             })
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('Supabase Realtime status:', status)
+      })
 
     return () => {
       supabase.removeChannel(channel)
