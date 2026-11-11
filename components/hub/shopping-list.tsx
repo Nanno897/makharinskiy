@@ -1,186 +1,193 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Loader2, Plus, ShoppingBasket, Trash2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { useRealtimeTable } from '@/hooks/use-realtime-table'
-import { useProfiles } from '@/hooks/use-profiles'
-import { SHOPPING_CATEGORIES, friendlyError, type ShoppingItem } from '@/lib/types'
+import { useState } from 'react'
+import { Plus, Trash2, FileText, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { MemberBadge } from './member-avatar'
-import { EmptyState, ErrorState, InlineError, ListSkeleton, SectionHeader } from './states'
-import { cn } from '@/lib/utils'
+
+export interface ShoppingItem {
+  id: string
+  name: string
+  quantity: string
+  note?: string
+  completed: boolean
+}
 
 export function ShoppingList({ userId }: { userId: string }) {
-  const { data, error, isLoading, mutate } = useRealtimeTable<ShoppingItem>('shopping_list', { orderBy: 'created_at' })
-  const { profiles } = useProfiles()
+  const [items, setItems] = useState<ShoppingItem[]>([])
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState('')
-  const [category, setCategory] = useState<string>('Produce')
-  const [adding, setAdding] = useState(false)
-  const [actionError, setActionError] = useState<string | null>(null)
+  
+  // Note editing state
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [noteText, setNoteText] = useState('')
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, ShoppingItem[]>()
-    for (const item of data ?? []) {
-      if (!map.has(item.category)) map.set(item.category, [])
-      map.get(item.category)!.push(item)
-    }
-    return [...map.entries()].sort(
-      ([a], [b]) =>
-        (SHOPPING_CATEGORIES as readonly string[]).indexOf(a) - (SHOPPING_CATEGORIES as readonly string[]).indexOf(b),
-    )
-  }, [data])
-
-  const remaining = (data ?? []).filter((i) => !i.completed).length
-  const doneCount = (data ?? []).length - remaining
-
-  async function addItem(e: React.FormEvent) {
+  const handleAddItem = (e: React.FormEvent) => {
     e.preventDefault()
-    const trimmed = name.trim()
-    if (!trimmed) return
-    setAdding(true)
-    setActionError(null)
-    const { error } = await createClient()
-      .from('shopping_list')
-      .insert({ name: trimmed, category, quantity: quantity.trim() || null, user_id: userId })
-    setAdding(false)
-    if (error) return setActionError(friendlyError(error))
+    if (!name.trim()) return
+
+    const newItem: ShoppingItem = {
+      id: crypto.randomUUID(),
+      name: name.trim(),
+      quantity: quantity.trim() || '1',
+      completed: false,
+    }
+
+    setItems((prev) => [...prev, newItem])
     setName('')
     setQuantity('')
-    mutate()
   }
 
-  async function toggle(item: ShoppingItem) {
-    mutate((items) => items?.map((i) => (i.id === item.id ? { ...i, completed: !i.completed } : i)), { revalidate: false })
-    const { error } = await createClient().from('shopping_list').update({ completed: !item.completed }).eq('id', item.id)
-    if (error) setActionError(friendlyError(error))
-    mutate()
+  const toggleComplete = (id: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, completed: !item.completed } : item
+      )
+    )
   }
 
-  async function remove(id: string) {
-    mutate((items) => items?.filter((i) => i.id !== id), { revalidate: false })
-    const { error } = await createClient().from('shopping_list').delete().eq('id', id)
-    if (error) setActionError(friendlyError(error))
-    mutate()
+  const handleDelete = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id))
   }
 
-  async function clearDone() {
-    const ids = (data ?? []).filter((i) => i.completed).map((i) => i.id)
-    if (!ids.length) return
-    mutate((items) => items?.filter((i) => !i.completed), { revalidate: false })
-    const { error } = await createClient().from('shopping_list').delete().in('id', ids)
-    if (error) setActionError(friendlyError(error))
-    mutate()
+  const startEditingNote = (item: ShoppingItem) => {
+    setEditingNoteId(item.id)
+    setNoteText(item.note || '')
+  }
+
+  const saveNote = (id: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, note: noteText.trim() } : item
+      )
+    )
+    setEditingNoteId(null)
+    setNoteText('')
   }
 
   return (
-    <section aria-labelledby="shopping-heading">
-      <SectionHeader title="Shopping List" subtitle={data ? `${remaining} item${remaining === 1 ? '' : 's'} to get` : undefined}>
-        {doneCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearDone}>
-            Clear {doneCount} done
-          </Button>
-        )}
-      </SectionHeader>
-      <h2 id="shopping-heading" className="sr-only">Shopping List</h2>
-
-      <form onSubmit={addItem} className="mb-6 rounded-2xl border border-border bg-card p-3">
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <label htmlFor="item-name" className="sr-only">Item</label>
-          <Input
-            id="item-name"
-            placeholder="Add an item…"
-            maxLength={120}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="flex-1"
-          />
-          <label htmlFor="item-qty" className="sr-only">Quantity</label>
-          <Input
-            id="item-qty"
-            placeholder="Qty"
-            maxLength={30}
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="sm:w-24"
-          />
-          <label htmlFor="item-category" className="sr-only">Category</label>
-          <select
-            id="item-category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {SHOPPING_CATEGORIES.map((c) => (
-              <option key={c} value={c} className="bg-card">
-                {c}
-              </option>
-            ))}
-          </select>
-          <Button type="submit" disabled={adding || !name.trim()}>
-            {adding ? <Loader2 className="animate-spin" /> : <Plus />}
-            Add
-          </Button>
-        </div>
-        <InlineError message={actionError} />
+    <div className="space-y-4">
+      {/* Input form for adding new item & quantity */}
+      <form onSubmit={handleAddItem} className="flex gap-2">
+        <Input
+          type="text"
+          placeholder="Item name..."
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="flex-1 bg-neutral-900 border-neutral-800 text-white"
+        />
+        <Input
+          type="text"
+          placeholder="Qty"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          className="w-20 bg-neutral-900 border-neutral-800 text-white"
+        />
+        <Button type="submit" size="icon" className="bg-red-600 hover:bg-red-700 text-white shrink-0">
+          <Plus className="size-5" />
+        </Button>
       </form>
 
-      {isLoading ? (
-        <ListSkeleton />
-      ) : error ? (
-        <ErrorState onRetry={() => mutate()} />
-      ) : !data?.length ? (
-        <EmptyState icon={ShoppingBasket} title="The list is empty" hint="Add the first item above." />
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          {grouped.map(([cat, items]) => (
-            <div key={cat} className="rounded-2xl border border-border bg-card p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">{cat}</h3>
-                <span className="text-xs text-muted-foreground">
-                  {items.filter((i) => !i.completed).length}/{items.length}
-                </span>
-              </div>
-              <ul className="flex flex-col">
-                {items.map((item) => (
-                  <li key={item.id} className="group flex items-center gap-3 border-t border-border py-2.5 first:border-t-0">
-                    <Checkbox
-                      id={`shop-${item.id}`}
-                      checked={item.completed}
-                      onCheckedChange={() => toggle(item)}
-                      className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-                    />
-                    <label
-                      htmlFor={`shop-${item.id}`}
-                      className={cn('min-w-0 flex-1 cursor-pointer', item.completed && 'text-muted-foreground line-through')}
-                    >
-                      <span className="block truncate text-sm">
-                        {item.name}
-                        {item.quantity && <span className="ml-2 text-xs text-gold/80">× {item.quantity}</span>}
-                      </span>
-                    </label>
-                    <span className="hidden sm:inline">
-                      <MemberBadge profile={profiles[item.user_id]} />
+      {/* Flat Item List (No Categories) */}
+      <div className="space-y-2">
+        {items.length === 0 ? (
+          <p className="text-center text-sm text-neutral-500 py-6">No items on the shopping list yet.</p>
+        ) : (
+          items.map((item) => (
+            <div
+              key={item.id}
+              className="flex flex-col gap-2 rounded-lg border border-neutral-800 bg-neutral-900/50 p-3"
+            >
+              <div className="flex items-center justify-between gap-3">
+                {/* Checkbox + Name + Quantity */}
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={item.completed}
+                    onChange={() => toggleComplete(item.id)}
+                    className="size-4 rounded border-neutral-700 bg-neutral-800 text-red-600 focus:ring-0"
+                  />
+                  <span
+                    className={`font-medium truncate ${
+                      item.completed ? 'line-through text-neutral-500' : 'text-white'
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                  {item.quantity && (
+                    <span className="text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 shrink-0">
+                      {item.quantity}
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => remove(item.id)}
-                      aria-label={`Delete ${item.name}`}
-                      className="text-muted-foreground hover:text-red-500"
-                    >
-                      <Trash2 />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
+                  )}
+                </div>
+
+                {/* Actions: Note button & Delete */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startEditingNote(item)}
+                    className={`size-8 hover:bg-neutral-800 ${
+                      item.note ? 'text-amber-400' : 'text-neutral-400'
+                    }`}
+                    title="Add / Edit Note"
+                  >
+                    <FileText className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(item.id)}
+                    className="size-8 text-neutral-400 hover:text-red-400 hover:bg-neutral-800"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Display existing note if not editing */}
+              {item.note && editingNoteId !== item.id && (
+                <p className="text-xs text-neutral-400 bg-neutral-950/60 p-2 rounded border border-neutral-850 italic">
+                  Note: {item.note}
+                </p>
+              )}
+
+              {/* Inline Note Editor */}
+              {editingNoteId === item.id && (
+                <div className="flex items-center gap-2 pt-1">
+                  <Input
+                    type="text"
+                    placeholder="Add a note (brand, size, etc.)..."
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    className="flex-1 h-8 text-xs bg-neutral-950 border-neutral-700 text-white"
+                    autoFocus
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    onClick={() => saveNote(item.id)}
+                    className="size-8 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                  >
+                    <Check className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditingNoteId(null)}
+                    className="size-8 text-neutral-400 hover:bg-neutral-800 shrink-0"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-    </section>
+          ))
+        )}
+      </div>
+    </div>
   )
 }
