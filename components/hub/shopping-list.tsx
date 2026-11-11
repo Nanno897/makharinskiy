@@ -52,11 +52,12 @@ export function ShoppingList({ userId }: { userId: string }) {
 
   return (
     <div className="relative min-h-[calc(100vh-140px)] rounded-2xl border border-rose-950/40 bg-gradient-to-b from-neutral-900 via-neutral-950 to-neutral-950 p-5 shadow-2xl overflow-hidden flex flex-col justify-between">
-      <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
+      {/* Load smooth handwritten script font */}
+      <link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet" />
 
       <div className="relative z-10 space-y-5">
         <div className="text-center pt-2 pb-1">
-          <h2 className="text-5xl font-normal text-rose-200/90 tracking-wide drop-shadow-md" style={{ fontFamily: "'Great Vibes', cursive" }}>
+          <h2 className="text-6xl font-normal text-rose-200/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "'Sacramento', cursive" }}>
             Shopping list
           </h2>
         </div>
@@ -94,22 +95,4 @@ export function ShoppingList({ userId }: { userId: string }) {
                 {item.note && editingNoteId !== item.id && <p className="text-xs text-neutral-400 pl-7 italic">Note: {item.note}</p>}
 
                 {editingNoteId === item.id && (
-                  <div className="flex items-center gap-2 pl-7 pt-1">
-                    <Input type="text" placeholder="Add a note..." value={noteText} onChange={(e) => setNoteText(e.target.value)} className="flex-1 h-8 text-xs bg-neutral-950 border-neutral-700 text-white" autoFocus />
-                    <Button type="button" size="icon" onClick={() => saveNote(item.id)} className="size-8 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"><Check className="size-4" /></Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => setEditingNoteId(null)} className="size-8 text-neutral-400 hover:bg-neutral-800 shrink-0"><X className="size-4" /></Button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-2 right-2 z-0 opacity-40 flex gap-1">
-        <div className="size-8 rounded-full bg-rose-900 blur-sm" />
-        <div className="size-6 rounded-full bg-red-800 blur-xs mt-3" />
-      </div>
-    </div>
-  )
-}
+                  <div className="flex items-center gap-2 pl-7 pt
