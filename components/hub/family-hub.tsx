@@ -16,13 +16,14 @@ export interface FamilyHubProps {
 
 export function HubBackground({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-[calc(100vh-140px)] rounded-2xl border border-rose-950/40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-black p-4 sm:p-6 shadow-2xl overflow-hidden flex flex-col justify-between">
+    <div className="relative h-full w-full rounded-2xl border border-rose-900/30 bg-gradient-to-br from-neutral-950 via-rose-950/20 to-neutral-900 p-4 sm:p-6 shadow-2xl overflow-hidden flex flex-col justify-between">
       <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet" />
       
-      {/* Marble texture overlay effect */}
-      <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+      {/* Real Marble Vein Swirl Effect */}
+      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-rose-700/30 via-transparent to-neutral-900/80 pointer-events-none" />
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%)] bg-[length:32px_32px] pointer-events-none" />
 
-      <div className="relative z-10 flex-1 flex flex-col">{children}</div>
+      <div className="relative z-10 flex-1 flex flex-col overflow-y-auto">{children}</div>
 
       {/* Red Floral Corner Accent */}
       <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-80 flex gap-1 p-4">
@@ -39,14 +40,18 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   return (
-    <div className="flex h-[100dvh] flex-col bg-black text-white overflow-hidden">
-      <HubHeader
-        onOpenProfile={() => setIsProfileOpen(true)}
-        userName={userName}
-        avatarUrl={avatarUrl}
-      />
+    <div className="flex h-[100dvh] flex-col bg-black text-white overflow-hidden justify-between">
+      {/* Header */}
+      <div className="flex-none">
+        <HubHeader
+          onOpenProfile={() => setIsProfileOpen(true)}
+          userName={userName}
+          avatarUrl={avatarUrl}
+        />
+      </div>
 
-      <main className="flex-1 overflow-y-auto p-4">
+      {/* Main Tab View with Marble Wrapper */}
+      <main className="flex-1 overflow-hidden p-3 sm:p-4">
         <HubBackground>
           {activeTab === 'shopping' && <ShoppingList userId={userId} />}
           {activeTab === 'schedule' && <Schedule userId={userId} />}
@@ -55,12 +60,12 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         </HubBackground>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav aria-label="Main Navigation" className="flex items-center justify-around border-t border-neutral-900 bg-neutral-950/90 backdrop-blur-md py-3 shadow-lg">
-        <button onClick={() => setActiveTab('shopping')} className={`text-xs font-medium transition-colors ${activeTab === 'shopping' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
-        <button onClick={() => setActiveTab('schedule')} className={`text-xs font-medium transition-colors ${activeTab === 'schedule' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
-        <button onClick={() => setActiveTab('todo')} className={`text-xs font-medium transition-colors ${activeTab === 'todo' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
-        <button onClick={() => setActiveTab('chat')} className={`text-xs font-medium transition-colors ${activeTab === 'chat' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
+      {/* Fixed Bottom Navigation Bar */}
+      <nav aria-label="Main Navigation" className="flex-none flex items-center justify-around border-t border-neutral-900 bg-neutral-950 py-3 shadow-2xl z-50">
+        <button onClick={() => setActiveTab('shopping')} className={`text-xs font-medium transition-all ${activeTab === 'shopping' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Shopping</button>
+        <button onClick={() => setActiveTab('schedule')} className={`text-xs font-medium transition-all ${activeTab === 'schedule' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Schedule</button>
+        <button onClick={() => setActiveTab('todo')} className={`text-xs font-medium transition-all ${activeTab === 'todo' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>To-Do</button>
+        <button onClick={() => setActiveTab('chat')} className={`text-xs font-medium transition-all ${activeTab === 'chat' ? 'text-red-500 font-bold scale-105' : 'text-neutral-400 hover:text-white'}`}>Chat</button>
       </nav>
 
       <ProfileDialog
