@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Check, Loader2, Upload } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Bell, Check, Link2, Loader2, LogOut, Upload } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { BADGE_COLORS, friendlyError, type Profile } from '@/lib/types'
@@ -39,7 +40,7 @@ async function compressImage(file: File, maxSide = 600, quality = 0.85): Promise
           else reject(new Error('Image compression failed'))
         },
         'image/webp',
-        quality
+        quality,
       )
     }
     img.onerror = () => reject(new Error('Failed to load image file'))
@@ -56,6 +57,7 @@ export function ProfileDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
+  const router = useRouter()
   const { profiles, mutate } = useProfiles()
   const me = profiles[userId]
   const [name, setName] = useState('')
@@ -63,7 +65,10 @@ export function ProfileDialog({
   const [color, setColor] = useState<string>('#eab308')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
+  const [copied, setCopied] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -72,6 +77,14 @@ export function ProfileDialog({
       setAvatarUrl(me?.avatar_url ?? '')
       setColor(me?.badge_color ?? '#eab308')
       setError(null)
+      setCopied(false)
+
+      // Check current notification permission
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        setNotifStatus(Notification.permission as 'granted' | 'denied')
+      } else {
+        setNotifStatus('unsupported')
+      }
     }
   }, [open, me])
 
@@ -80,10 +93,9 @@ export function ProfileDialog({
     setUploading(true)
     setError(null)
     try {
-      // Compress/resize file automatically
       const compressedBlob = await compressImage(file, 600, 0.85)
       const supabase = createClient()
-      const path = `${userId}/${Date.now()}.webp`
+      const path = `\( {userId}/ \){Date.now()}.webp`
       const { error } = await supabase.storage
         .from('avatars')
         .upload(path, compressedBlob, { upsert: true, contentType: 'image/webp' })
@@ -107,7 +119,12 @@ export function ProfileDialog({
     setSaving(true)
     setError(null)
     try {
-      const update: Profile = { id: userId, display_name: trimmed, avatar_url: url || null, badge_color: color }
+      const update: Profile = {
+        id: userId,
+        display_name: trimmed,
+        avatar_url: url || null,
+        badge_color: color,
+      }
       const { error } = await createClient()
         .from('profiles')
         .upsert({ ...update, updated_at: new Date().toISOString() })
@@ -122,15 +139,62 @@ export function ProfileDialog({
     }
   }
 
-  const preview: Profile = { id: userId, display_name: name || 'You', avatar_url: avatarUrl || null, badge_color: color }
+  async function handleEnableNotifications() {
+    if (!('Notification' in window)) {
+      setNotifStatus('unsupported')
+      return
+    }
+    try {
+      const permission = await Notification.requestPermission()
+      setNotifStatus(permission === 'granted' ? 'granted' : 'denied')
+    } catch {
+      setNotifStatus('denied')
+    }
+  }
+
+  async function handleShareInvite() {
+    const inviteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://makharinskiy-nanno897.vercel.app'
+    try {
+      await navigator.clipboard.writeText(inviteUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for older browsers
+      prompt('Copy this invite link:', inviteUrl)
+    }
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      onOpenChange(false)
+      router.replace('/auth/login')
+      router.refresh()
+    } catch (err) {
+      console.error('Logout error:', err)
+      setError('Could not log out. Please try again.')
+      setLoggingOut(false)
+    }
+  }
+
+  const preview: Profile = {
+    id: userId,
+    display_name: name || 'You',
+    avatar_url: avatarUrl || null,
+    badge_color: color,
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-rose-900/40 bg-neutral-950 text-white sm:max-w-md">
+      <DialogContent className="border border-rose-900/40 bg-neutral-950 text-white sm:max-w-md max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSave} className="grid gap-5">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">Profile settings</DialogTitle>
-            <DialogDescription className="text-neutral-400">How the family sees you across the hub.</DialogDescription>
+            <DialogDescription className="text-neutral-400">
+              How the family sees you across the hub.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="flex items-center gap-4">
@@ -148,12 +212,24 @@ export function ProfileDialog({
                   e.target.value = ''
                 }}
               />
-              <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
                 {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
                 {uploading ? 'Processing...' : 'Upload photo'}
               </Button>
               {avatarUrl && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => setAvatarUrl('')} className="text-neutral-400 hover:text-white">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAvatarUrl('')}
+                  className="text-neutral-400 hover:text-white"
+                >
                   Remove photo
                 </Button>
               )}
@@ -175,7 +251,14 @@ export function ProfileDialog({
 
           <div className="grid gap-2">
             <Label htmlFor="display-name-edit">Display name</Label>
-            <Input id="display-name-edit" required maxLength={40} value={name} onChange={(e) => setName(e.target.value)} className="bg-neutral-900 border-neutral-800 text-white" />
+            <Input
+              id="display-name-edit"
+              required
+              maxLength={40}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-neutral-900 border-neutral-800 text-white"
+            />
           </div>
 
           <fieldset className="grid gap-2">
@@ -207,15 +290,74 @@ export function ProfileDialog({
           )}
 
           <DialogFooter className="bg-transparent">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="text-neutral-400 hover:text-white">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              className="text-neutral-400 hover:text-white"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={saving || uploading} className="bg-red-600 hover:bg-red-700 text-white">
+            <Button
+              type="submit"
+              disabled={saving || uploading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
               {saving && <Loader2 className="animate-spin" />}
               Save profile
             </Button>
           </DialogFooter>
         </form>
+
+        {/* ─── Bottom actions: Notifications · Invite · Logout ─── */}
+        <div className="mt-2 border-t border-white/10 pt-4 space-y-2">
+          {/* Enable Notifications */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start gap-3 border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 text-left"
+            onClick={handleEnableNotifications}
+            disabled={notifStatus === 'granted' || notifStatus === 'unsupported'}
+          >
+            <Bell className="size-4 shrink-0 text-amber-400" />
+            <span className="flex-1">
+              {notifStatus === 'granted'
+                ? 'Notifications enabled'
+                : notifStatus === 'denied'
+                  ? 'Notifications blocked (check browser settings)'
+                  : notifStatus === 'unsupported'
+                    ? 'Notifications not supported'
+                    : 'Enable notifications'}
+            </span>
+          </Button>
+
+          {/* Share / Invite link */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start gap-3 border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 text-left"
+            onClick={handleShareInvite}
+          >
+            <Link2 className="size-4 shrink-0 text-amber-400" />
+            <span className="flex-1">{copied ? 'Link copied!' : 'Share / Invite link'}</span>
+          </Button>
+
+          {/* Logout */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start gap-3 border-red-900/50 bg-red-950/30 hover:bg-red-950/50 text-red-300 hover:text-red-200"
+            onClick={handleLogout}
+            disabled={loggingOut}
+          >
+            {loggingOut ? (
+              <Loader2 className="size-4 shrink-0 animate-spin" />
+            ) : (
+              <LogOut className="size-4 shrink-0" />
+            )}
+            <span className="flex-1">{loggingOut ? 'Signing out…' : 'Log out'}</span>
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )
