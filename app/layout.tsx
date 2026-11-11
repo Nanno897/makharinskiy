@@ -17,14 +17,14 @@ export const metadata: Metadata = {
     capable: true, 
     title: 'MAKHARINSKIY', 
     statusBarStyle: 'black-translucent' 
-  },
+  }
   other: {
     'apple-mobile-web-app-capable': 'yes',
-  },
+  }
   icons: {
     icon: [{ url: '/logo.jpg', type: 'image/jpeg' }],
     apple: '/logo.jpg',
-  },
+  }
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
