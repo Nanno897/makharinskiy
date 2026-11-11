@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, LogOut } from 'lucide-react'
+import { Loader2, LogOut, Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Button } from '@/components/ui/button'
