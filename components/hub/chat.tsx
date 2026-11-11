@@ -1,5 +1,5 @@
 'use client'
-import { ChatCharacters } from './chat-characters'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { Loader2, MessageCircle, SendHorizontal, Smile } from 'lucide-react'
@@ -13,6 +13,7 @@ import { EmptyState, ErrorState, InlineError, ListSkeleton, SectionHeader } from
 import { EmojiPicker } from './emoji-picker'
 import { cn } from '@/lib/utils'
 import { playChatToggleFeedback, triggerHaptic } from '@/lib/feedback'
+import { ChatCharacters } from './chat-characters'
 
 function dayLabel(d: Date) {
   if (isToday(d)) return 'Today'
@@ -73,7 +74,10 @@ export function Chat({ userId }: { userId: string }) {
     <section className="flex h-[calc(100svh-16rem)] min-h-[420px] flex-col md:h-[calc(100svh-12rem)]">
       <SectionHeader title="Family Chat" subtitle="Live with everyone at home" />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+        {/* Helcurt & Lunox characters */}
+        <ChatCharacters isSending={sending} />
+
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-label="Messages">
           {isLoading ? (
             <ListSkeleton rows={4} />
@@ -120,7 +124,9 @@ export function Chat({ userId }: { userId: string }) {
                         <p
                           className={cn(
                             'whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm',
-                            mine ? 'rounded-br-sm bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white shadow-[0_0_15px_rgba(159,18,57,0.3)] border border-rose-800/60' : 'rounded-bl-sm bg-neutral-900/80 border border-white/[0.06] text-neutral-200'
+                            mine
+                              ? 'rounded-br-sm bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white shadow-[0_0_15px_rgba(159,18,57,0.3)] border border-rose-800/60'
+                              : 'rounded-bl-sm bg-neutral-900/80 border border-white/[0.06] text-neutral-200'
                           )}
                           title={format(date, 'PPpp')}
                         >
@@ -163,7 +169,9 @@ export function Chat({ userId }: { userId: string }) {
             >
               <Smile />
             </Button>
-            <label htmlFor="chat-input" className="sr-only">Message</label>
+            <label htmlFor="chat-input" className="sr-only">
+              Message
+            </label>
             <textarea
               id="chat-input"
               ref={inputRef}
@@ -181,7 +189,13 @@ export function Chat({ userId }: { userId: string }) {
               }}
               className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-rose-700"
             />
-            <Button type="submit" size="icon" disabled={sending || !text.trim()} aria-label="Send message" className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]">
+            <Button
+              type="submit"
+              size="icon"
+              disabled={sending || !text.trim()}
+              aria-label="Send message"
+              className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]"
+            >
               {sending ? <Loader2 className="animate-spin" /> : <SendHorizontal />}
             </Button>
           </form>
