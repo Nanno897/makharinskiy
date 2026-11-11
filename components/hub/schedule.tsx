@@ -362,63 +362,6 @@ function EventDialog({
           </div>
           <div className="flex items-center gap-2">
             <Checkbox id="ev-allday" checked={allDay} onCheckedChange={(v) => setAllDay(v === true)} />
-            <Label htmlFor="ev-allday">
-                 <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <MapPin className="size-3" aria-hidden="true" />
-                            {ev.location}
-                          </p>
-                        )}
-                      </div>
-                      {ev.user_id === userId && (
-                        <Button
-                          variant="ghost"
-                          size="icon
-m() || null,
-        color,
-        user_id: userId,
-      })
-    setSaving(false)
-    if (error) return setError(friendlyError(error))
-    setTitle('')
-    setLocation('')
-    setDescription('')
-    setEnd('')
-    onCreated()
-    onOpenChange(false)
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-border bg-card sm:max-w-md">
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-xl">New event</DialogTitle>
-            <DialogDescription>Add something to the family calendar.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-2">
-            <Label htmlFor="ev-title">Title</Label>
-            <Input id="ev-title" required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2 grid gap-2">
-              <Label htmlFor="ev-date">Date</Label>
-              <Input id="ev-date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="[color-scheme:dark]" />
-            </div>
-            {!allDay && (
-              <>
-                <div className="grid gap-2">
-                  <Label htmlFor="ev-start">Start</Label>
-                  <Input id="ev-start" type="time" value={start} onChange={(e) => setStart(e.target.value)} className="[color-scheme:dark]" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="ev-end">End (optional)</Label>
-                  <Input id="ev-end" type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="[color-scheme:dark]" />
-                </div>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox id="ev-allday" checked={allDay} onCheckedChange={(v) => setAllDay(v === true)} />
             <Label htmlFor="ev-allday">All day</Label>
           </div>
           <div className="grid gap-2">
@@ -459,26 +402,4 @@ m() || null,
       </DialogContent>
     </Dialog>
   )
-}
-// Helper to check if a specific date is a German holiday
-function getGermanHoliday(date: Date): string | null {
-  const day = date.getDate();
-  const month = date.getMonth() + 1; // 1-12
-  const year = date.getFullYear();
-
-  // Fixed date official holidays
-  if (month === 1 && day === 1) return "Neujahr (New Year)";
-  if (month === 5 && day === 1) return "Tag der Arbeit";
-  if (month === 10 && day === 3) return "Tag der Deutschen Einheit";
-  if (month === 12 && day === 25) return "1. Weihnachtsfeiertag";
-  if (month === 12 && day === 26) return "2. Weihnachtsfeiertag";
-
-  // Unofficial holidays & observances
-  if (month === 2 && day === 14) return "Valentinstag";
-  if (month === 10 && day === 31) return "Halloween";
-  if (month === 12 && day === 6) return "Nikolaus";
-  if (month === 12 && day === 31) return "Silvester";
-
-  // Dynamic Easter-based holidays calculation can also be plugged in here
-  return null;
 }
