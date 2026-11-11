@@ -8,7 +8,6 @@ import { Schedule } from '@/components/hub/schedule'
 import { TodoList } from '@/components/hub/todo-list'
 import { Chat } from '@/components/hub/chat'
 import { ProfileDialog } from '@/components/hub/profile-dialog'
-import { MembersModal } from '@/components/hub/members-modal'
 
 export interface FamilyHubProps {
   userId: string
@@ -19,7 +18,6 @@ export interface FamilyHubProps {
 export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
   const [activeTab, setActiveTab] = useState<'shopping' | 'schedule' | 'todo' | 'chat'>('shopping')
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [isMembersOpen, setIsMembersOpen] = useState(false)
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black text-white overflow-hidden select-none">
@@ -76,13 +74,6 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
         open={isProfileOpen}
         onOpenChange={setIsProfileOpen}
         userId={userId}
-        onOpenMembers={() => setIsMembersOpen(true)}
-      />
-
-      {/* Members Directory Modal */}
-      <MembersModal
-        open={isMembersOpen}
-        onOpenChange={setIsMembersOpen}
       />
     </div>
   )
