@@ -52,7 +52,6 @@ export function HubHeader({
     }
   }
 
-  // Construct current user profile object for rendering
   const currentProfile = me || {
     id: userId,
     display_name: userName || 'You',
@@ -60,16 +59,18 @@ export function HubHeader({
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-4 h-16 bg-neutral-950/80 backdrop-blur border-b border-rose-950/30">
-      <div className="flex items-center gap-2">
-        <Crest />
+    <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-rose-950/40 shadow-lg">
+      <div className="flex items-center gap-3">
+        <div className="scale-110 origin-left">
+          <Crest />
+        </div>
         <div>
-          <h1 className="text-white font-bold leading-none">Makharinskiy</h1>
-          <span className="text-xs text-neutral-400">FAMILY HUB</span>
+          <h1 className="text-white font-serif text-lg sm:text-xl font-bold leading-tight tracking-wide">Makharinskiy</h1>
+          <span className="text-[11px] font-medium tracking-[0.2em] text-rose-400/80">FAMILY HUB</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onOpenProfile}
@@ -77,7 +78,7 @@ export function HubHeader({
           title="Open Profile Settings"
           aria-label="Open Profile Settings"
         >
-          <MemberAvatar profile={currentProfile} userId={userId} gold />
+          <MemberAvatar profile={currentProfile} userId={userId} gold size="md" />
         </button>
 
         <Button
@@ -85,7 +86,7 @@ export function HubHeader({
           size="icon"
           onClick={requestPermission}
           title="Enable Push Notifications"
-          className="text-amber-400 hover:text-amber-300"
+          className="text-amber-400 hover:text-amber-300 size-10"
         >
           <Bell className="h-5 w-5" />
         </Button>
@@ -95,7 +96,7 @@ export function HubHeader({
           size="icon" 
           onClick={signOut} 
           disabled={signingOut}
-          className="text-neutral-400 hover:text-white"
+          className="text-neutral-400 hover:text-white size-10"
           title="Sign out"
         >
           {signingOut ? (
