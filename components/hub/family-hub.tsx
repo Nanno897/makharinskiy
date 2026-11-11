@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Header } from '@/components/hub/hub-header'
+import { HubHeader as Header } from '@/components/hub/hub-header'
 import { Navigation } from '@/components/hub/navigation'
 import { ShoppingList } from '@/components/hub/shopping-list'
 import { ProfileDialog } from '@/components/hub/profile-dialog'
@@ -74,48 +74,3 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       {/* Header with active Profile Trigger on question mark */}
       <Header
         onOpenProfile={() => setIsProfileOpen(true)}
-        userName={userName}
-        avatarUrl={avatarUrl}
-      />
-
-      {/* Main Tab View Wrapped in Marble/Floral Theme */}
-      <main className="flex-1 overflow-y-auto p-4">
-        <HubBackground>
-          {activeTab === 'shopping' && <ShoppingList userId={userId} />}
-
-          {activeTab === 'schedule' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
-              <h3 className="text-xl font-semibold text-white mb-2">Schedule & Calendar</h3>
-              <p className="text-sm">Your family schedule will appear here.</p>
-            </div>
-          )}
-
-          {activeTab === 'todo' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
-              <h3 className="text-xl font-semibold text-white mb-2">To-Do Tasks</h3>
-              <p className="text-sm">Your active tasks list will appear here.</p>
-            </div>
-          )}
-
-          {activeTab === 'chat' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400">
-              <h3 className="text-xl font-semibold text-white mb-2">Family Chat</h3>
-              <p className="text-sm">Real-time messaging will appear here.</p>
-            </div>
-          )}
-        </HubBackground>
-      </main>
-
-      {/* Bottom Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={(tab: any) => setActiveTab(tab)} />
-
-      {/* Profile Dialog */}
-      <ProfileDialog
-        open={isProfileOpen}
-        onOpenChange={setIsProfileOpen}
-        userId={userId}
-        currentAvatarUrl={avatarUrl}
-      />
-    </div>
-  )
-}
