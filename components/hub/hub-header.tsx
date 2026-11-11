@@ -60,9 +60,11 @@ export function HubHeader({
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-white/[0.06] shadow-lg">
       <div className="flex items-center gap-3">
-        {/* Big M Logo without ring */}
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/20 via-neutral-900 to-neutral-950 border border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
-          <span className="font-serif text-2xl font-bold text-amber-300">M</span>
+        {/* Bold Crimson & Gold "M" App Icon */}
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose-800 via-rose-950 to-neutral-950 border border-amber-400/40 shadow-[0_0_20px_rgba(159,18,57,0.4)]">
+          <span className="font-serif text-xl font-bold tracking-wider text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            M
+          </span>
         </div>
         <div>
           <h1 className="text-white font-serif text-lg sm:text-xl font-bold leading-tight tracking-wide">Makharinskiy</h1>
@@ -71,15 +73,15 @@ export function HubHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Profile photo inside a thin gold ring */}
+        {/* Profile photo without the golden ring */}
         <button
           type="button"
           onClick={onOpenProfile}
-          className="rounded-full p-0.5 transition-transform active:scale-95 hover:ring-2 hover:ring-amber-400/50"
+          className="rounded-full p-0.5 transition-transform active:scale-95 hover:opacity-90"
           title="Open Profile Settings"
           aria-label="Open Profile Settings"
         >
-          <MemberAvatar profile={currentProfile} userId={userId} gold size="md" />
+          <MemberAvatar profile={currentProfile} userId={userId} size="md" />
         </button>
 
         {/* Notifications in muted gold */}
