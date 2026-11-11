@@ -61,10 +61,10 @@ export function HubHeader({
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-5 h-20 bg-neutral-950/85 backdrop-blur-md border-b border-white/[0.06] shadow-lg">
       <div className="flex items-center gap-3">
-        {/* Custom Logo Graphic */}
-        <div className="relative size-11 shrink-0 overflow-hidden rounded-xl border border-amber-400/30 shadow-[0_0_20px_rgba(159,18,57,0.4)]">
+        {/* Custom Logo Graphic without border */}
+        <div className="relative size-11 shrink-0 overflow-hidden rounded-xl shadow-[0_0_20px_rgba(159,18,57,0.4)]">
           <Image
-            src="/icon.png" // Update to your exact uploaded asset name if placed in public folder (e.g. /logo.png)
+            src="/logo.jpg"
             alt="Makharinskiy Logo"
             fill
             className="object-cover"
