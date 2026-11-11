@@ -1,3 +1,4 @@
+import { PushButton } from '@/components/push-button'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { FamilyHub } from '@/components/hub/family-hub'
@@ -10,5 +11,10 @@ export default async function Home() {
 
   if (!user) redirect('/auth/login')
 
-  return <FamilyHub userId={user.id} email={user.email ?? ''} />
+  return (
+    <>
+      <FamilyHub userId={user.id} email={user.email} />
+      <PushButton />
+    </>
+  )
 }
