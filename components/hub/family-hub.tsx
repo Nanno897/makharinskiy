@@ -34,7 +34,7 @@ export function FamilyHub({ userId, userName, avatarUrl }: FamilyHubProps) {
       <div className="absolute inset-0 bg-neutral-950/30 backdrop-blur-[2px] border border-amber-500/[0.03] pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="relative z-20 flex-none bg-neutral-950/40 backdrop-blur-md border-b border-rose-950/30">
+      <div className="relative z-20 flex-none bg-neutral-950/40 backdrop-blur-md border-b border-rose-950/30 pt-[env(safe-area-inset-top)]">
         <HubHeader
           userId={userId}
           onOpenProfile={() => setIsProfileOpen(true)}
