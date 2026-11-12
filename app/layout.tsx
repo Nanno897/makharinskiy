@@ -13,21 +13,21 @@ export const metadata: Metadata = {
   description: 'Shopping, schedule, tasks and chat',
   applicationName: 'MAKHARINSKIY',
   generator: 'v0.app',
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     title: 'MAKHARINSKIY',
     statusBarStyle: 'black-translucent',
   },
   icons: {
-    icon: [{ url: '/logo.jpg', type: 'image/jpeg' }],
-    apple: '/logo.jpg',
+    icon: [{ url: '/logo-icon.png', type: 'image/png' }],
+    apple: '/logo-icon.png',
   },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
-  themeColor: '#09090b',
+  themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
