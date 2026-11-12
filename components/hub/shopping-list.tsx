@@ -105,13 +105,22 @@ export function ShoppingList({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-160px)] bg-transparent p-2 sm:p-4 flex flex-col justify-between">
+    <div className="relative min-h-[calc(100vh-160px)] bg-transparent p-2 sm:p-4 flex flex-col justify-between pb-16">
       <div className="space-y-5">
-        <div className="pt-2">
-          <h2 className="font-serif text-2xl sm:text-3xl font-semibold tracking-wide text-white">
-            Shopping list
-          </h2>
-          <p className="text-xs text-neutral-400 mt-0.5">Manage items needed for home</p>
+        {/* Header with Top-Right Floating Chibi */}
+        <div className="flex items-center justify-between pt-2">
+          <div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold tracking-wide text-white">
+              Shopping list
+            </h2>
+            <p className="text-xs text-neutral-400 mt-0.5">Manage items needed for home</p>
+          </div>
+
+          <img
+            src="/miya-chibi.png"
+            alt="Miya Chibi"
+            className="size-16 sm:size-20 object-contain shrink-0 pointer-events-none select-none animate-bounce [animation-duration:3s] drop-shadow-[0_0_14px_rgba(159,18,57,0.55)]"
+          />
         </div>
 
         <form onSubmit={addItem} className="flex gap-2">
@@ -211,6 +220,15 @@ export function ShoppingList({ userId }: { userId: string }) {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Lower-Left Floating Chibi */}
+      <div className="pointer-events-none select-none pt-4 flex justify-start">
+        <img
+          src="/odette-chibi.png"
+          alt="Odette Chibi"
+          className="size-16 sm:size-20 object-contain animate-bounce [animation-duration:3.4s] drop-shadow-[0_0_14px_rgba(245,158,11,0.4)]"
+        />
       </div>
     </div>
   )
