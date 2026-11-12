@@ -177,28 +177,29 @@ export function TodoList({ userId }: { userId: string }) {
               <li
                 key={todo.id}
                 className={cn(
-                  'flex items-center gap-3 rounded-2xl border bg-neutral-950/40 backdrop-blur-md px-4 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all',
+                  'flex items-start gap-3 rounded-2xl border bg-neutral-950/40 backdrop-blur-md px-4 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all',
                   todo.priority && !todo.completed ? 'border-amber-500/40 bg-neutral-900/50' : 'border-white/[0.06]',
                   todo.completed && 'opacity-50 bg-neutral-950/20'
                 )}
               >
-                <Checkbox
-                  id={`todo-${todo.id}`}
-                  checked={todo.completed}
-                  onCheckedChange={() => update(todo, { completed: !todo.completed })}
-                  className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700"
-                />
+                <div className="pt-0.5">
+                  <Checkbox
+                    id={`todo-${todo.id}`}
+                    checked={todo.completed}
+                    onCheckedChange={() => update(todo, { completed: !todo.completed })}
+                    className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700"
+                  />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <label
-                    htmlFor={`todo-${todo.id}`}
-                    className={cn('block cursor-pointer truncate text-sm text-white font-medium', todo.completed && 'text-neutral-400 line-through')}
+                  <span
+                    className={cn('block text-sm text-white font-medium whitespace-normal break-words leading-relaxed', todo.completed && 'text-neutral-400 line-through')}
                   >
                     {todo.title}
-                  </label>
+                  </span>
                   {due && (
                     <span
                       className={cn(
-                        'mt-0.5 inline-flex items-center gap-1 text-xs',
+                        'mt-1 inline-flex items-center gap-1 text-xs',
                         overdue ? 'text-red-400' : isToday(due) ? 'text-amber-400' : 'text-neutral-400',
                       )}
                     >
@@ -208,26 +209,28 @@ export function TodoList({ userId }: { userId: string }) {
                     </span>
                   )}
                 </div>
-                <MemberAvatar profile={profiles[todo.user_id]} size="sm" />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-pressed={todo.priority}
-                  aria-label={todo.priority ? 'Remove priority' : 'Mark as priority'}
-                  onClick={() => update(todo, { priority: !todo.priority })}
-                  className={cn(todo.priority ? 'text-amber-400 bg-amber-950/30' : 'text-neutral-500 hover:text-amber-400')}
-                >
-                  <Star className={cn(todo.priority && 'fill-amber-400')} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => remove(todo.id)}
-                  aria-label={`Delete ${todo.title}`}
-                  className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
-                >
-                  <Trash2 />
-                </Button>
+                <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                  <MemberAvatar profile={profiles[todo.user_id]} size="sm" />
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-pressed={todo.priority}
+                    aria-label={todo.priority ? 'Remove priority' : 'Mark as priority'}
+                    onClick={() => update(todo, { priority: !todo.priority })}
+                    className={cn(todo.priority ? 'text-amber-400 bg-amber-950/30' : 'text-neutral-500 hover:text-amber-400')}
+                  >
+                    <Star className={cn(todo.priority && 'fill-amber-400')} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => remove(todo.id)}
+                    aria-label={`Delete ${todo.title}`}
+                    className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
               </li>
             )
           })}
