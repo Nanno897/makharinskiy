@@ -297,5 +297,118 @@ function EventDialog({ userId, open, onOpenChange, defaultDate, onCreated }: { u
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!title.trim() ||
-        
+    if (!title.trim() || !date) {
+      setError('Title and date are required.')
+      return
+    }
+    
+    const startsAt = new Date(`${date}T${allDay ? '00:00' : start}`)
+    const endsAt = !allDay && end ? new Date(`${date}T${end}`) : null
+    
+    if (endsAt && endsAt <= startsAt) {
+      setError('End time must be after start time.')
+      return
+    }
+    
+    setSaving(true)
+    setError(null)
+    
+    const { error } = await createClient()
+      .from('events')
+      .insert({
+        title: title.trim(),
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt?.toISOString() ?? null,
+        all_day: allDay,
+        location: location.trim() || null,
+        description: description.trim() || null,
+        color,
+        user_id: userId,
+      })
+      
+    setSaving(false)
+    if (error) {
+      setError(friendlyError(error))
+      return
+    }
+    setTitle('')
+    setLocation('')
+    setDescription('')
+    setEnd('')
+    onCreated()
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="border border-white/[0.08] bg-neutral-950/90 backdrop-blur-2xl sm:max-w-md text-white shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl text-white">New event</DialogTitle>
+            <DialogDescription className="text-neutral-400">Add something to the family calendar.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <Label htmlFor="ev-title" className="text-neutral-300">Title</Label>
+            <Input id="ev-title" required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className="border-white/10 bg-black/40 text-white" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2 grid gap-2">
+              <Label htmlFor="ev-date" className="text-neutral-300">Date</Label>
+              <Input id="ev-date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="border-white/10 bg-black/40 text-white [color-scheme:dark]" />
+            </div>
+            {!allDay && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="ev-start" className="text-neutral-300">Start</Label>
+                  <Input id="ev-start" type="time" value={start} onChange={(e) => setStart(e.target.value)} className="border-white/10 bg-black/40 text-white [color-scheme:dark]" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="ev-end" className="text-neutral-300">End (optional)</Label>
+                  <Input id="ev-end" type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="border-white/10 bg-black/40 text-white [color-scheme:dark]" />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="ev-allday" checked={allDay} onCheckedChange={(v) => setAllDay(v === true)} className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700" />
+            <Label htmlFor="ev-allday" className="text-neutral-300">All day</Label>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="ev-location" className="text-neutral-300">Location</Label>
+            <Input id="ev-location" maxLength={200} value={location} onChange={(e) => setLocation(e.target.value)} className="border-white/10 bg-black/40 text-white" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="ev-desc" className="text-neutral-300">Notes</Label>
+            <Textarea id="ev-desc" maxLength={1000} rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className="border-white/10 bg-black/40 text-white" />
+          </div>
+          <fieldset>
+            <legend className="mb-2 text-sm font-medium text-neutral-300">Color</legend>
+            <div className="flex gap-2">
+              {EVENT_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  aria-label={`Event color ${c}`}
+                  aria-pressed={color === c}
+                  onClick={() => setColor(c)}
+                  className={cn('size-7 rounded-full ring-offset-2 ring-offset-neutral-950', color === c && 'ring-2 ring-white')}
+                  style={{ backgroundColor: c }}
+                />
+              ))}
+            </div>
+          </fieldset>
+          <InlineError message={error} />
+          <DialogFooter className="bg-transparent">
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="text-neutral-400 hover:text-white hover:bg-white/[0.04]">
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving} className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]">
+              {saving ? <Loader2 className="animate-spin" /> : <Plus />}
+              Add event
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
