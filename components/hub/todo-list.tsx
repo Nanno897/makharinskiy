@@ -177,4 +177,35 @@ export function TodoList({ userId }: { userId: string }) {
               <li
                 key={todo.id}
                 className={cn(
-                  'flex items-center gap-3 rounded-2xl border bg-neutral-950/40 backdrop-blur-md px-4 py-3
+                  'flex items-center gap-3 rounded-2xl border bg-neutral-950/40 backdrop-blur-md px-4 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all',
+                  todo.priority && !todo.completed ? 'border-amber-500/40 bg-neutral-900/50' : 'border-white/[0.06]',
+                  todo.completed && 'opacity-50 bg-neutral-950/20'
+                )}
+              >
+                <Checkbox
+                  id={`todo-${todo.id}`}
+                  checked={todo.completed}
+                  onCheckedChange={() => update(todo, { completed: !todo.completed })}
+                  className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700"
+                />
+                <div className="min-w-0 flex-1">
+                  <label
+                    htmlFor={`todo-${todo.id}`}
+                    className={cn('block cursor-pointer truncate text-sm text-white font-medium', todo.completed && 'text-neutral-400 line-through')}
+                  >
+                    {todo.title}
+                  </label>
+                  {due && (
+                    <span
+                      className={cn(
+                        'mt-0.5 inline-flex items-center gap-1 text-xs',
+                        overdue ? 'text-red-400' : isToday(due) ? 'text-amber-400' : 'text-neutral-400',
+                      )}
+                    >
+                      <CalendarClock className="size-3" aria-hidden="true" />
+                      {overdue ? 'Overdue · ' : isToday(due) ? 'Today · ' : ''}
+                      {format(due, 'EEE, MMM d')}
+                    </span>
+                  )}
+                </div>
+                <MemberAvatar profile={
