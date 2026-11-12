@@ -30,7 +30,7 @@ export function HubHeader({
       <div className="flex items-center gap-3">
         <div className="relative size-8 shrink-0 overflow-hidden rounded-xl opacity-90 shadow-[0_0_15px_rgba(159,18,57,0.3)]">
           <Image
-            src="/logo.jpg"
+            src="/logo-icon.png"
             alt="Makharinskiy Logo"
             fill
             className="object-cover"
