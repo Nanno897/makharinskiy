@@ -208,4 +208,31 @@ export function TodoList({ userId }: { userId: string }) {
                     </span>
                   )}
                 </div>
-                <MemberAvatar profile={
+                <MemberAvatar profile={profiles[todo.user_id]} size="sm" />
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-pressed={todo.priority}
+                  aria-label={todo.priority ? 'Remove priority' : 'Mark as priority'}
+                  onClick={() => update(todo, { priority: !todo.priority })}
+                  className={cn(todo.priority ? 'text-amber-400 bg-amber-950/30' : 'text-neutral-500 hover:text-amber-400')}
+                >
+                  <Star className={cn(todo.priority && 'fill-amber-400')} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => remove(todo.id)}
+                  aria-label={`Delete ${todo.title}`}
+                  className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
+                >
+                  <Trash2 />
+                </Button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
+  )
+}
