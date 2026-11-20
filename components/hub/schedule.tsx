@@ -50,10 +50,6 @@ import { cn } from '@/lib/utils'
 
 const EVENT_COLORS = ['#dc2626', '#eab308', '#f59e0b', '#3b82f6', '#10b981', '#a855f7']
 
-type AssignedEvent = FamilyEvent & {
-  assigned_to?: string | null
-}
-
 function getEasterSunday(year: number): Date {
   const a = year % 19
   const b = Math.floor(year / 100)
@@ -77,73 +73,47 @@ function getGermanHoliday(date: Date): string | null {
   const month = date.getMonth() + 1
   const year = date.getFullYear()
 
-  if (month === 1 && day === 1) return "Neujahr (New Year's Day)"
-  if (month === 5 && day === 1) return "Tag der Arbeit (Labour Day)"
+  if (month === 1 && day === 1) return "Neujahr"
+  if (month === 5 && day === 1) return "Tag der Arbeit"
   if (month === 10 && day === 3) return "Tag der Deutschen Einheit"
-  if (month === 12 && day === 25) return "1. Weihnachtsfeiertag (Christmas)"
-  if (month === 12 && day === 26) return "2. Weihnachtsfeiertag (Boxing Day)"
-  if (month === 2 && day === 14) return "Valentinstag (Valentine's Day)"
-  if (month === 10 && day === 31) return "Halloween"
+  if (month === 12 && day === 25) return "Weihnachten"
+  if (month === 12 && day === 26) return "2. Weihnachtsfeiertag"
+  if (month === 2 && day === 14) return "Valentinstag"
   if (month === 12 && day === 6) return "Nikolaus"
-  if (month === 12 && day === 31) return "Silvester (New Year's Eve)"
+  if (month === 12 && day === 31) return "Silvester"
 
   const easter = getEasterSunday(year)
-
   const karfreitag = new Date(easter)
   karfreitag.setDate(easter.getDate() - 2)
-  if (date.toDateString() === karfreitag.toDateString()) return "Karfreitag (Good Friday)"
+  if (date.toDateString() === karfreitag.toDateString()) return "Karfreitag"
 
   const ostermontag = new Date(easter)
   ostermontag.setDate(easter.getDate() + 1)
-  if (date.toDateString() === ostermontag.toDateString()) return "Ostermontag (Easter Monday)"
-
-  const himmelfahrt = new Date(easter)
-  himmelfahrt.setDate(easter.getDate() + 39)
-  if (date.toDateString() === himmelfahrt.toDateString()) return "Christi Himmelfahrt (Ascension Day)"
-
-  const pfingstmontag = new Date(easter)
-  pfingstmontag.setDate(easter.getDate() + 50)
-  if (date.toDateString() === pfingstmontag.toDateString()) return "Pfingstmontag (Whit Monday)"
+  if (date.toDateString() === ostermontag.toDateString()) return "Ostermontag"
 
   return null
 }
 
 export function Schedule({ userId }: { userId: string }) {
-  const { data, error, isLoading, mutate } = useRealtimeTable<AssignedEvent>('events', {
+  const { data, error, isLoading, mutate } = useRealtimeTable<FamilyEvent>('events', {
     orderBy: 'starts_at',
   })
   const { profiles } = useProfiles()
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
   const [selected, setSelected] = useState(() => new Date())
-  const [memberFilter, setMemberFilter] = useState<string>('all')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  const memberList = useMemo(() => Object.values(profiles ?? {}), [profiles])
-
-  const filteredEvents = useMemo(() => {
-    const list = data ?? []
-    if (memberFilter === 'all') return list
-    if (memberFilter === 'everyone') {
-      return list.filter((ev) => !ev.assigned_to || ev.assigned_to === 'everyone')
-    }
-    return list.filter(
-      (ev) => ev.assigned_to === memberFilter || (!ev.assigned_to && ev.user_id === memberFilter),
-    )
-  }, [data, memberFilter])
-
-  const days = useMemo(
-    () =>
-      eachDayOfInterval({
-        start: startOfWeek(startOfMonth(month)),
-        end: endOfWeek(endOfMonth(month)),
-      }),
-    [month],
-  )
+  const days = useMemo(() => {
+    return eachDayOfInterval({
+      start: startOfWeek(startOfMonth(month)),
+      end: endOfWeek(endOfMonth(month)),
+    })
+  }, [month])
 
   const eventsByDay = useMemo(() => {
-    const map = new Map<string, AssignedEvent[]>()
-    for (const ev of filteredEvents) {
+    const map = new Map<string, FamilyEvent[]>()
+    for (const ev of data ?? []) {
       const start = startOfDay(parseISO(ev.starts_at))
       const end = ev.ends_at ? endOfDay(parseISO(ev.ends_at)) : start
       const range = eachDayOfInterval({ start, end })
@@ -154,15 +124,10 @@ export function Schedule({ userId }: { userId: string }) {
       }
     }
     return map
-  }, [filteredEvents])
+  }, [data])
 
   const selectedEvents = eventsByDay.get(format(selected, 'yyyy-MM-dd')) ?? []
   const activeHoliday = getGermanHoliday(selected)
-
-  function getAssigneeLabel(ev: AssignedEvent): string {
-    if (!ev.assigned_to || ev.assigned_to === 'everyone') return 'Everyone'
-    return profiles[ev.assigned_to]?.display_name || 'Family member'
-  }
 
   async function remove(id: string) {
     mutate((list) => list?.filter((e) => e.id !== id), { revalidate: false })
@@ -176,54 +141,11 @@ export function Schedule({ userId }: { userId: string }) {
       <SectionHeader title="Family Schedule" subtitle="Shared calendar for everyone">
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]"
+          className="bg-rose-700 hover:bg-rose-600 text-white"
         >
           <CalendarPlus /> New event
         </Button>
       </SectionHeader>
-
-      {/* Member filter */}
-      <div className="mb-4 flex flex-wrap items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => setMemberFilter('all')}
-          className={cn(
-            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-            memberFilter === 'all'
-              ? 'bg-rose-700 text-white'
-              : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
-          )}
-        >
-          All schedules
-        </button>
-        <button
-          type="button"
-          onClick={() => setMemberFilter('everyone')}
-          className={cn(
-            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-            memberFilter === 'everyone'
-              ? 'bg-rose-700 text-white'
-              : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
-          )}
-        >
-          Everyone
-        </button>
-        {memberList.map((member) => (
-          <button
-            key={member.id}
-            type="button"
-            onClick={() => setMemberFilter(member.id)}
-            className={cn(
-              'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-              memberFilter === member.id
-                ? 'bg-rose-700 text-white'
-                : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
-            )}
-          >
-            {member.display_name || 'Member'}
-          </button>
-        ))}
-      </div>
 
       {isLoading ? (
         <ListSkeleton rows={6} />
@@ -231,15 +153,13 @@ export function Schedule({ userId }: { userId: string }) {
         <ErrorState onRetry={() => mutate()} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          {/* Calendar */}
-          <div className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+          <div className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 p-4">
             <div className="mb-4 flex items-center justify-between">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setMonth((m) => addMonths(m, -1))}
-                aria-label="Previous month"
-                className="text-amber-300 hover:text-amber-200 hover:bg-white/[0.04]"
+                className="text-amber-300"
               >
                 <ChevronLeft />
               </Button>
@@ -250,18 +170,15 @@ export function Schedule({ userId }: { userId: string }) {
                 variant="ghost"
                 size="icon"
                 onClick={() => setMonth((m) => addMonths(m, 1))}
-                aria-label="Next month"
-                className="text-amber-300 hover:text-amber-200 hover:bg-white/[0.04]"
+                className="text-amber-300"
               >
                 <ChevronRight />
               </Button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-neutral-400">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                <div key={d} className="py-1">
-                  {d}
-                </div>
+                <div key={d} className="py-1">{d}</div>
               ))}
             </div>
 
@@ -276,28 +193,22 @@ export function Schedule({ userId }: { userId: string }) {
                     key={day.toISOString()}
                     type="button"
                     onClick={() => setSelected(day)}
-                    aria-label={format(day, 'EEEE, MMMM d')}
-                    aria-pressed={isSel}
                     className={cn(
-                      'flex aspect-square flex-col items-center justify-start gap-1 rounded-xl p-1 text-sm transition-all sm:p-2',
+                      'flex aspect-square flex-col items-center justify-start gap-1 rounded-xl p-1 text-sm',
                       !isSameMonth(day, month) && 'text-neutral-600',
-                      isSameMonth(day, month) && !isSel && 'text-neutral-200 hover:bg-white/[0.04]',
-                      isSel &&
-                        'bg-gradient-to-br from-rose-700 via-rose-900 to-rose-950 text-white font-semibold shadow-[0_0_20px_rgba(159,18,57,0.5)] border border-rose-800/60 scale-105 z-10',
-                      !isSel && isToday(day) && 'ring-1 ring-amber-400/60 text-amber-300',
+                      isSameMonth(day, month) && !isSel && 'text-neutral-200',
+                      isSel && 'bg-rose-800 text-white font-semibold',
+                      !isSel && isToday(day) && 'ring-1 ring-amber-400 text-amber-300',
                     )}
                   >
-                    <span className="font-medium">{format(day, 'd')}</span>
-                    <span className="flex gap-0.5 items-center">
-                      {holiday && (
-                        <span className="size-1.5 rounded-full bg-amber-400" title={holiday} />
-                      )}
+                    <span>{format(day, 'd')}</span>
+                    <span className="flex gap-0.5">
+                      {holiday && <span className="size-1.5 rounded-full bg-amber-400" />}
                       {evs.slice(0, 3).map((ev) => (
                         <span
                           key={ev.id}
                           className="size-1.5 rounded-full"
                           style={{ backgroundColor: ev.color || '#f43f5e' }}
-                          title={ev.title}
                         />
                       ))}
                     </span>
@@ -307,34 +218,25 @@ export function Schedule({ userId }: { userId: string }) {
             </div>
           </div>
 
-          {/* Selected day events */}
           <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
-                {isToday(selected) ? 'Today' : format(selected, 'EEEE, MMM d')}
-              </h3>
-              <img
-                src="/franco-chibi.png"
-                alt="Franco Chibi"
-                className="size-14 sm:size-16 object-contain shrink-0 pointer-events-none select-none animate-bounce [animation-duration:3s] drop-shadow-[0_0_14px_rgba(159,18,57,0.55)]"
-              />
-            </div>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-amber-300">
+              {isToday(selected) ? 'Today' : format(selected, 'EEEE, MMM d')}
+            </h3>
 
             <InlineError message={actionError} />
 
             <div className="flex flex-col gap-2">
               {activeHoliday && (
-                <div className="rounded-2xl border border-amber-500/30 bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-                  <div className="flex items-center gap-2 text-amber-300 font-medium">
+                <div className="rounded-2xl border border-amber-500/30 bg-neutral-950/40 p-4">
+                  <div className="flex items-center gap-2 text-amber-300">
                     <Sparkles className="size-4" />
                     <span>{activeHoliday}</span>
                   </div>
-                  <p className="mt-1 text-xs text-neutral-400">German Holiday / Observance</p>
                 </div>
               )}
 
               {selectedEvents.length === 0 && !activeHoliday ? (
-                <EmptyState icon={CalendarPlus} title="No events" hint="Nothing planned for this day." />
+                <EmptyState icon={CalendarPlus} title="No events" hint="Nothing planned." />
               ) : (
                 selectedEvents.map((ev) => {
                   const startDate = parseISO(ev.starts_at)
@@ -342,25 +244,25 @@ export function Schedule({ userId }: { userId: string }) {
                   const isMultiDay = endDate && !isSameDay(startDate, endDate)
 
                   let timeText = 'All day'
+                  if (ev.all_day) {
+                    if (isMultiDay && endDate) {
+                      timeText = format(startDate, 'MMM d') + ' - ' + format(endDate, 'MMM d')
+                    }
+                  } else {
+                    timeText = format(startDate, 'h:mm a')
+                    if (endDate) {
+                      timeText = timeText + ' - ' + format(endDate, 'h:mm a')
+                    }
+                  }
 
-if (ev.all_day) {
-  if (isMultiDay && endDate) {
-    timeText = format(startDate, 'MMM d') + ' - ' + format(endDate, 'MMM d')
-  }
-} else {
-  timeText = format(startDate, 'h:mm a')
-  if (endDate) {
-    timeText = timeText + ' - ' + format(endDate, 'h:mm a')
-  }
-}
                   return (
                     <div
                       key={ev.id}
-                      className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-                      style={{ borderLeft: `3px solid ${ev.color}` }}
+                      className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 p-4"
+                      style={{ borderLeft: '3px solid ' + (ev.color || '#f43f5e') }}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
+                        <div>
                           <p className="font-medium text-white">{ev.title}</p>
                           <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
                             <Clock className="size-3" />
@@ -378,8 +280,7 @@ if (ev.all_day) {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => remove(ev.id)}
-                            aria-label={`Delete ${ev.title}`}
-                            className="text-neutral-500 hover:text-red-400 hover:bg-red-950/30"
+                            className="text-neutral-500"
                           >
                             <Trash2 />
                           </Button>
@@ -390,11 +291,8 @@ if (ev.all_day) {
                         <p className="mt-2 text-sm text-neutral-300">{ev.description}</p>
                       )}
 
-                      <div className="mt-3 flex items-center gap-2">
+                      <div className="mt-3">
                         <MemberBadge profile={profiles[ev.user_id]} />
-                        <span className="text-xs text-neutral-500">
-                          {getAssigneeLabel(ev)}
-                        </span>
                       </div>
                     </div>
                   )
@@ -410,7 +308,6 @@ if (ev.all_day) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         defaultDate={selected}
-        memberList={memberList}
         onCreated={() => mutate()}
       />
     </section>
@@ -422,14 +319,12 @@ function EventDialog({
   open,
   onOpenChange,
   defaultDate,
-  memberList,
   onCreated,
 }: {
   userId: string
   open: boolean
   onOpenChange: (o: boolean) => void
   defaultDate: Date
-  memberList: { id: string; display_name: string }[]
   onCreated: () => void
 }) {
   const [title, setTitle] = useState('')
@@ -441,7 +336,6 @@ function EventDialog({
   const [location, setLocation] = useState('')
   const [description, setDescription] = useState('')
   const [color, setColor] = useState(EVENT_COLORS[4])
-  const [assignedTo, setAssignedTo] = useState<string>('everyone')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -471,12 +365,12 @@ function EventDialog({
 
     const startsAt = allDay
       ? startOfDay(new Date(startDate))
-      : new Date(`\( {startDate}T \){startTime}`)
+      : new Date(startDate + 'T' + startTime)
 
     const endsAt = allDay
       ? endOfDay(new Date(finalEndDate))
       : endTime
-        ? new Date(`\( {finalEndDate}T \){endTime}`)
+        ? new Date(finalEndDate + 'T' + endTime)
         : null
 
     if (endsAt && endsAt <= startsAt) {
@@ -487,19 +381,16 @@ function EventDialog({
     setSaving(true)
     setError(null)
 
-    const { error } = await createClient()
-      .from('events')
-      .insert({
-        title: title.trim(),
-        starts_at: startsAt.toISOString(),
-        ends_at: endsAt?.toISOString() ?? null,
-        all_day: allDay,
-        location: location.trim() || null,
-        description: description.trim() || null,
-        color,
-        user_id: userId,
-        assigned_to: assignedTo === 'everyone' ? null : assignedTo,
-      })
+    const { error } = await createClient().from('events').insert({
+      title: title.trim(),
+      starts_at: startsAt.toISOString(),
+      ends_at: endsAt ? endsAt.toISOString() : null,
+      all_day: allDay,
+      location: location.trim() || null,
+      description: description.trim() || null,
+      color,
+      user_id: userId,
+    })
 
     setSaving(false)
     if (error) {
@@ -512,48 +403,137 @@ function EventDialog({
     setDescription('')
     setEndTime('')
     setAllDay(true)
-    setAssignedTo('everyone')
     onCreated()
     onOpenChange(false)
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-white/[0.08] bg-neutral-950/90 backdrop-blur-2xl sm:max-w-md text-white shadow-[0_20px_50px_rgba(0,0,0,0.9)] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="border border-white/[0.08] bg-neutral-950/90 text-white max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle className="font-serif text-xl text-white">New event</DialogTitle>
+            <DialogTitle className="font-serif text-xl">New event</DialogTitle>
             <DialogDescription className="text-neutral-400">
               Add something to the family calendar.
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-2">
-            <Label htmlFor="ev-title" className="text-neutral-300">
-              Title
-            </Label>
+            <Label>Title</Label>
             <Input
-              id="ev-title"
               required
-              maxLength={120}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Vacation, Meeting, Birthday..."
               className="border-white/10 bg-black/40 text-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-2">
-              <Label htmlFor="ev-start-date" className="text-neutral-300">
-                From
-              </Label>
+              <Label>From</Label>
               <Input
-                id="ev-start-date"
                 type="date"
                 required
                 value={startDate}
                 onChange={(e) => {
                   setStartDate(e.target.value)
                   if (!endDate || endDate < e.target.value) setEndDate(e.target.value)
-  
+                }}
+                className="border-white/10 bg-black/40 text-white"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>To</Label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border-white/10 bg-black/40 text-white"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={allDay}
+              onCheckedChange={(v) => setAllDay(v === true)}
+            />
+            <Label>All day</Label>
+          </div>
+
+          {!allDay && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-2">
+                <Label>Start time</Label>
+                <Input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="border-white/10 bg-black/40 text-white"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>End time</Label>
+                <Input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="border-white/10 bg-black/40 text-white"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-2">
+            <Label>Location</Label>
+            <Input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="border-white/10 bg-black/40 text-white"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Notes</Label>
+            <Textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="border-white/10 bg-black/40 text-white"
+            />
+          </div>
+
+          <div>
+            <Label className="mb-2 block">Color</Label>
+            <div className="flex gap-2">
+              {EVENT_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  className={cn(
+                    'size-7 rounded-full',
+                    color === c && 'ring-2 ring-white',
+                  )}
+                  style={{ backgroundColor: c }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <InlineError message={error} />
+
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving} className="bg-rose-700 text-white">
+              {saving ? <Loader2 className="animate-spin" /> : <Plus />}
+              Add event
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
