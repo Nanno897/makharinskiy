@@ -341,11 +341,18 @@ export function Schedule({ userId }: { userId: string }) {
                   const endDate = ev.ends_at ? parseISO(ev.ends_at) : null
                   const isMultiDay = endDate && !isSameDay(startDate, endDate)
 
-                  const timeText = ev.all_day
-  ? isMultiDay
-    ? `${format(startDate, 'MMM d')} - ${format(endDate!, 'MMM d')}`
-    : 'All day'
-  : `\( {format(startDate, 'h:mm a')} \){endDate ? ` - ${format(endDate, 'h:mm a')}` : ''}`
+                  let timeText = 'All day'
+
+if (ev.all_day) {
+  if (isMultiDay && endDate) {
+    timeText = format(startDate, 'MMM d') + ' - ' + format(endDate, 'MMM d')
+  }
+} else {
+  timeText = format(startDate, 'h:mm a')
+  if (endDate) {
+    timeText = timeText + ' - ' + format(endDate, 'h:mm a')
+  }
+}
                   return (
                     <div
                       key={ev.id}
