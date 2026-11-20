@@ -343,7 +343,7 @@ export function Schedule({ userId }: { userId: string }) {
 
                   const timeText = ev.all_day
                     ? isMultiDay
-                      ? `${format(startDate, 'MMM d')} → ${format(endDate!, 'MMM d')}`
+                      ? `${format(startDate, 'MMM d')} - ${format(endDate!, 'MMM d')}`
                       : 'All day'
                     : `\( {format(startDate, 'h:mm a')} \){endDate ? ` – ${format(endDate, 'h:mm a')}` : ''}`
 
