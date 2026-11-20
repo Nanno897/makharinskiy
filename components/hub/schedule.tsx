@@ -16,7 +16,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns'
-import { CalendarPlus, ChevronLeft, ChevronRight, Clock, Loader2, MapPin, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { CalendarPlus, ChevronLeft, ChevronRight, Clock, MapPin, Sparkles, Trash2, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -32,6 +32,10 @@ import { EmptyState, ErrorState, InlineError, ListSkeleton, SectionHeader } from
 import { cn } from '@/lib/utils'
 
 const EVENT_COLORS = ['#dc2626', '#eab308', '#f59e0b', '#3b82f6', '#10b981', '#a855f7']
+
+type AssignedEvent = FamilyEvent & {
+  assigned_to?: string | null
+}
 
 function getEasterSunday(year: number): Date {
   const a = year % 19
@@ -88,22 +92,35 @@ function getGermanHoliday(date: Date): string | null {
 }
 
 export function Schedule({ userId }: { userId: string }) {
-  const { data, error, isLoading, mutate } = useRealtimeTable<FamilyEvent>('events', { orderBy: 'starts_at' })
+  const { data, error, isLoading, mutate } = useRealtimeTable<AssignedEvent>('events', { orderBy: 'starts_at' })
   const { profiles } = useProfiles()
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
   const [selected, setSelected] = useState(() => new Date())
+  const [memberFilter, setMemberFilter] = useState<string>('all')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  const memberList = useMemo(() => Object.values(profiles ?? {}), [profiles])
+
+  const filteredEvents = useMemo(() => {
+    const list = data ?? []
+    if (memberFilter === 'all') return list
+    if (memberFilter === 'everyone') {
+      return list.filter((ev) => !ev.assigned_to || ev.assigned_to === 'everyone')
+    }
+    return list.filter(
+      (ev) => ev.assigned_to === memberFilter || (!ev.assigned_to && ev.user_id === memberFilter),
+    )
+  }, [data, memberFilter])
 
   const days = useMemo(
     () => eachDayOfInterval({ start: startOfWeek(startOfMonth(month)), end: endOfWeek(endOfMonth(month)) }),
     [month],
   )
 
-  // Multi-day support
   const eventsByDay = useMemo(() => {
-    const map = new Map<string, FamilyEvent[]>()
-    for (const ev of data ?? []) {
+    const map = new Map<string, AssignedEvent[]>()
+    for (const ev of filteredEvents) {
       const start = startOfDay(parseISO(ev.starts_at))
       const end = ev.ends_at ? endOfDay(parseISO(ev.ends_at)) : start
       const range = eachDayOfInterval({ start, end })
@@ -114,10 +131,15 @@ export function Schedule({ userId }: { userId: string }) {
       }
     }
     return map
-  }, [data])
+  }, [filteredEvents])
 
   const selectedEvents = eventsByDay.get(format(selected, 'yyyy-MM-dd')) ?? []
   const activeHoliday = getGermanHoliday(selected)
+
+  function getAssigneeLabel(ev: AssignedEvent): string {
+    if (!ev.assigned_to || ev.assigned_to === 'everyone') return 'Everyone'
+    return profiles[ev.assigned_to]?.display_name || 'Family member'
+  }
 
   async function remove(id: string) {
     mutate((list) => list?.filter((e) => e.id !== id), { revalidate: false })
@@ -129,10 +151,55 @@ export function Schedule({ userId }: { userId: string }) {
   return (
     <section>
       <SectionHeader title="Family Schedule" subtitle="Shared calendar for everyone">
-        <Button onClick={() => setDialogOpen(true)} className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]">
+        <Button
+          onClick={() => setDialogOpen(true)}
+          className="bg-rose-700 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.4)]"
+        >
           <CalendarPlus /> New event
         </Button>
       </SectionHeader>
+
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setMemberFilter('all')}
+          className={cn(
+            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+            memberFilter === 'all'
+              ? 'bg-rose-700 text-white'
+              : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
+          )}
+        >
+          All schedules
+        </button>
+        <button
+          type="button"
+          onClick={() => setMemberFilter('everyone')}
+          className={cn(
+            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+            memberFilter === 'everyone'
+              ? 'bg-rose-700 text-white'
+              : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
+          )}
+        >
+          Everyone
+        </button>
+        {memberList.map((member) => (
+          <button
+            key={member.id}
+            type="button"
+            onClick={() => setMemberFilter(member.id)}
+            className={cn(
+              'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+              memberFilter === member.id
+                ? 'bg-rose-700 text-white'
+                : 'bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]',
+            )}
+          >
+            {member.display_name || 'Member'}
+          </button>
+        ))}
+      </div>
 
       {isLoading ? (
         <ListSkeleton rows={6} />
@@ -247,17 +314,25 @@ export function Schedule({ userId }: { userId: string }) {
                     ? isMultiDay
                       ? `${format(startDate, 'MMM d')} → ${format(endDate!, 'MMM d')}`
                       : 'All day'
-                    : `\( {format(startDate, 'h:mm a')} \){endDate ? ` – ${format(endDate, 'h:mm a')}` : ''}`
+                    : `${format(startDate, 'h:mm a')}${endDate ? ` – ${format(endDate, 'h:mm a')}` : ''}`
+
+                  const assigneeName = getAssigneeLabel(ev)
 
                   return (
                     <div
                       key={ev.id}
                       className="rounded-2xl border border-white/[0.06] bg-neutral-950/40 backdrop-blur-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-                      style={{ borderLeft: `3px solid ${ev.color}` }}
+                      style={{ borderLeft: `3px solid ${ev.color || '#dc2626'}` }}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="font-medium text-white">{ev.title}</p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-medium text-white">{ev.title}</p>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2 py-0.5 text-[11px] text-amber-200">
+                              <Users className="size-3" />
+                              {assigneeName}
+                            </span>
+                          </div>
                           <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
                             <Clock className="size-3" />
                             {timeText}
@@ -287,7 +362,7 @@ export function Schedule({ userId }: { userId: string }) {
                       <div className="mt-3 flex items-center gap-2">
                         <MemberBadge profile={profiles[ev.user_id]} />
                         <span className="text-xs text-neutral-500">
-                          {profiles[ev.user_id]?.display_name || 'Family member'}
+                          Added by {profiles[ev.user_id]?.display_name || 'Family member'}
                         </span>
                       </div>
                     </div>
@@ -323,12 +398,16 @@ function EventDialog({
   defaultDate: Date
   onCreated: () => void
 }) {
+  const { profiles } = useProfiles()
+  const memberList = useMemo(() => Object.values(profiles ?? {}), [profiles])
+
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [startTime, setStartTime] = useState('18:00')
   const [endTime, setEndTime] = useState('')
   const [allDay, setAllDay] = useState(true)
+  const [assignedTo, setAssignedTo] = useState<string>('everyone')
   const [location, setLocation] = useState('')
   const [description, setDescription] = useState('')
   const [color, setColor] = useState(EVENT_COLORS[4])
@@ -342,6 +421,8 @@ function EventDialog({
       const d = format(defaultDate, 'yyyy-MM-dd')
       setStartDate(d)
       setEndDate(d)
+      setAssignedTo('everyone')
+      setColor(EVENT_COLORS[4])
       setError(null)
     }
   }
@@ -360,14 +441,19 @@ function EventDialog({
     }
 
     const startsAt = allDay
-      ? startOfDay(new Date(startDate))
-      : new Date(`\( {startDate}T \){startTime}`)
+      ? startOfDay(parseISO(startDate))
+      : new Date(`${startDate}T${startTime}`)
 
     const endsAt = allDay
-      ? endOfDay(new Date(finalEndDate))
+      ? endOfDay(parseISO(finalEndDate))
       : endTime
-        ? new Date(`\( {finalEndDate}T \){endTime}`)
+        ? new Date(`${finalEndDate}T${endTime}`)
         : null
+
+    if (Number.isNaN(startsAt.getTime()) || (endsAt && Number.isNaN(endsAt.getTime()))) {
+      setError('Please enter a valid date and time.')
+      return
+    }
 
     if (endsAt && endsAt <= startsAt) {
       setError('End time must be after start time.')
@@ -384,6 +470,7 @@ function EventDialog({
         starts_at: startsAt.toISOString(),
         ends_at: endsAt?.toISOString() ?? null,
         all_day: allDay,
+        assigned_to: assignedTo,
         location: location.trim() || null,
         description: description.trim() || null,
         color,
@@ -433,86 +520,3 @@ function EventDialog({
             <div className="grid gap-2">
               <Label htmlFor="ev-start-date" className="text-neutral-300">From</Label>
               <Input
-                id="ev-start-date"
-                type="date"
-                required
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value)
-                  if (!endDate || endDate < e.target.value) setEndDate(e.target.value)
-                }}
-                className="border-white/10 bg-black/40 text-white [color-scheme:dark]"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="ev-end-date" className="text-neutral-300">To</Label>
-              <Input
-                id="ev-end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border-white/10 bg-black/40 text-white [color-scheme:dark]"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="ev-allday"
-              checked={allDay}
-              onCheckedChange={(v) => setAllDay(v === true)}
-              className="border-white/20 data-[state=checked]:bg-rose-700 data-[state=checked]:border-rose-700"
-            />
-            <Label htmlFor="ev-allday" className="text-neutral-300">All day</Label>
-          </div>
-
-          {!allDay && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label htmlFor="ev-start-time" className="text-neutral-300">Start time</Label>
-                <Input
-                  id="ev-start-time"
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="border-white/10 bg-black/40 text-white [color-scheme:dark]"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="ev-end-time" className="text-neutral-300">End time</Label>
-                <Input
-                  id="ev-end-time"
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="border-white/10 bg-black/40 text-white [color-scheme:dark]"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="grid gap-2">
-            <Label htmlFor="ev-location" className="text-neutral-300">Location</Label>
-            <Input
-              id="ev-location"
-              maxLength={200}
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="border-white/10 bg-black/40 text-white"
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="ev-desc" className="text-neutral-300">Notes</Label>
-            <Textarea
-              id="ev-desc"
-              maxLength={1000}
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="border-white/10 bg-black/40 text-white"
-            />
-          </div>
-
-          <fieldset>
-            <legend className="m
